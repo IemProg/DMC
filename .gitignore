@@ -1,0 +1,51 @@
+# ---- Data and experiment outputs -------------------------------------------
+DATA/
+data/
+output/
+output_*/
+runs/
+wandb/
+
+# ---- Model checkpoints ------------------------------------------------------
+*.pt
+*.pth
+*.ckpt
+*.bin
+*.safetensors
+checkpoints/
+
+# ---- Logs -------------------------------------------------------------------
+*.log
+logs/
+events.out.tfevents.*
+
+# ---- Python -----------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+build/
+dist/
+.eggs/
+*.so
+.ipynb_checkpoints/
+.pytest_cache/
+.venv/
+venv/
+env/
+
+# ---- Editors / OS -----------------------------------------------------------
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*~
+
+# ---- Paper sources (kept out of the code release) ---------------------------
+*.pdf
+!assets/*.pdf
+paper/
+neurips_*/
+rebuttal/
+teacher_model/
