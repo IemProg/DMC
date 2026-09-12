@@ -2,8 +2,11 @@
 
 **Decoupled Mode Connectivity for Base-to-Novel Generalization in Vision-Language Models**
 
-> Anonymous submission — under review. Author list, paper link and BibTeX entry
-> will be added once the review process completes.
+[Imad Eddine Marouf](https://iemprog.github.io/), Khalid Oublal,
+[Enzo Tartaglione](https://enzotarta.github.io/),
+[Stéphane Lathuilière](https://stelat.eu/)
+
+Télécom Paris, Institut Polytechnique de Paris, France
 
 ---
 
@@ -287,8 +290,18 @@ the single-prompt ceiling — are `single_prompt_va_*`, `zsdd_*`, `kl_path_*`,
 
 ## Citation
 
-The paper is currently under review. A BibTeX entry will be added on
-publication.
+The paper is currently under review; the venue and DOI will be added once it is
+published.
+
+```bibtex
+@article{marouf2026dmc,
+  title   = {Decoupled Mode Connectivity for Base-to-Novel Generalization
+             in Vision-Language Models},
+  author  = {Marouf, Imad Eddine and Oublal, Khalid and
+             Tartaglione, Enzo and Lathuili{\`e}re, St{\'e}phane},
+  year    = {2026}
+}
+```
 
 ## Acknowledgments
 
