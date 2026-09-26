@@ -5,7 +5,7 @@
 #
 # Runs all 3 seeds. Each stage skips if output already exists.
 
-HERE="$(cd "${HERE}" && pwd)"
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${HERE}/../env.sh"
 
 DATASET=$1

@@ -5,7 +5,7 @@
 # Training: CE(f_base) + VA(f_base) + LMC(w1 -> f_base)
 # Eval: alpha sweep from w1 to f_base
 
-HERE="$(cd "${HERE}" && pwd)"
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${HERE}/../env.sh"
 
 TRAINER=KgCoOp_COOP_LMC

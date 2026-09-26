@@ -5,7 +5,7 @@
 # Usage:
 #   bash w_schedule_test.sh <DATASET> <W_MAX> <W_LMC> <W_SCHEDULE> <W_MIN> <SEED> <CFG>
 
-HERE="$(cd "${HERE}" && pwd)"
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${HERE}/../env.sh"
 
 TRAINER=KgCoOp_COOP_LMC

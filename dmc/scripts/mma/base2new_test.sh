@@ -1,6 +1,6 @@
 #!/bin/bash
 
-HERE="$(cd "${HERE}" && pwd)"
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${HERE}/../env.sh"
 
 TRAINER=MultiModalAdapter

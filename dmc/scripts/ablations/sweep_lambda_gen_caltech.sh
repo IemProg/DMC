@@ -2,7 +2,7 @@
 
 # DPP: Sweep W_GEN for Caltech (seed 1, W_GEN=8.0 already done)
 
-HERE="$(cd "${HERE}" && pwd)"
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${HERE}/../env.sh"
 
 for W_GEN in 4.0 16.0

@@ -6,7 +6,7 @@
 # VA_W: Visual Anchor weight (e.g., 0.1, 0.5, 1.0, 2.0)
 # VA_TAU: Visual Anchor temperature (default: 2.0)
 
-HERE="$(cd "${HERE}" && pwd)"
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${HERE}/../env.sh"
 
 TRAINER=KgCoOp_COOP_LMC

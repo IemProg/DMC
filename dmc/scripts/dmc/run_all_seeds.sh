@@ -3,7 +3,7 @@
 # DPP + VA: Full pipeline (train + eval base + eval new) for all 3 seeds
 # Usage: bash run_all_seeds.sh <DATASET> <W_GEN> <W_LMC> <VA_W> <CFG> [VA_TAU]
 
-HERE="$(cd "${HERE}" && pwd)"
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${HERE}/../env.sh"
 
 VA_TAU=${6:-2.0}

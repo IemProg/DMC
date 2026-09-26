@@ -5,7 +5,7 @@
 # Usage:
 #   bash prompt_ewc_test.sh <DATASET> <CLIP_W> <W_LMC> <PROMPT_FISHER_W> <FISHER_NORM> <SEED> <CFG>
 
-HERE="$(cd "${HERE}" && pwd)"
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${HERE}/../env.sh"
 
 TRAINER=KgCoOp_COOP_LMC

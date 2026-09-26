@@ -5,7 +5,7 @@
 #
 # SUB defaults to "new". Pass "base" to evaluate on base classes.
 
-HERE="$(cd "${HERE}" && pwd)"
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${HERE}/../env.sh"
 
 TRAINER=KgCoOp_COOP_LMC

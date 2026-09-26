@@ -6,7 +6,7 @@
 # W_GEN: cosine score weight for ctx_gen (e.g., 8.0)
 # W_LMC: LMC path weight (e.g., 1.0)
 
-HERE="$(cd "${HERE}" && pwd)"
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${HERE}/../env.sh"
 
 TRAINER=KgCoOp_COOP_LMC

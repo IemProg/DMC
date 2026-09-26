@@ -3,7 +3,7 @@
 # DPP: Sweep W_LMC for Flowers (W_GEN=8.0 fixed, W_LMC=1.0 already done)
 # Testing whether stronger LMC path constraint reduces seed variance
 
-HERE="$(cd "${HERE}" && pwd)"
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${HERE}/../env.sh"
 
 for W_LMC in 2.0 4.0

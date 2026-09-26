@@ -4,7 +4,7 @@
 # Usage: bash dmc_no_va_run.sh <DATASET> <W_GEN> <W_LMC> <SEED> <CFG>
 
 
-HERE="$(cd "${HERE}" && pwd)"
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${HERE}/../env.sh"
 
 echo "=== DPP: Training (W_GEN=$2, W_LMC=$3) ==="

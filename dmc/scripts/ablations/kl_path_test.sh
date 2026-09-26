@@ -5,7 +5,7 @@
 # Usage:
 #   bash kl_path_test.sh <DATASET> <CLIP_W> <W_LMC> <KL_PATH_W> <SEED> <CFG>
 
-HERE="$(cd "${HERE}" && pwd)"
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${HERE}/../env.sh"
 
 TRAINER=KgCoOp_COOP_LMC

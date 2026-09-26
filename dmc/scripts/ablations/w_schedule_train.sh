@@ -11,7 +11,7 @@
 #
 # W_MIN=0.0 means auto (W_MAX / 3)
 
-HERE="$(cd "${HERE}" && pwd)"
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${HERE}/../env.sh"
 
 TRAINER=KgCoOp_COOP_LMC

@@ -6,7 +6,7 @@
 # Computes γ = cos(∇L_CE, ∇R) at the MERGETUNE convergence point
 # for each dataset and seed. No retraining needed.
 
-HERE="$(cd "${HERE}" && pwd)"
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${HERE}/../env.sh"
 
 TRAINER=KgCoOp_COOP_LMC

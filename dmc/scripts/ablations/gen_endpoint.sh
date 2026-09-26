@@ -5,7 +5,7 @@
 # Uses existing DMC+VA checkpoints — no retraining needed
 # Evaluates on base and new splits for each dataset/seed
 
-HERE="$(cd "${HERE}" && pwd)"
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${HERE}/../env.sh"
 
 TRAINER=KgCoOp_COOP_LMC

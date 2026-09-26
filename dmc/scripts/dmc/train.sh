@@ -3,7 +3,7 @@
 # DPP + Visual Anchor training
 # Usage: bash train.sh <DATASET> <W_GEN> <W_LMC> <VA_W> <SEED> <CFG> [VA_TAU]
 
-HERE="$(cd "${HERE}" && pwd)"
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${HERE}/../env.sh"
 
 TRAINER=KgCoOp_COOP_LMC

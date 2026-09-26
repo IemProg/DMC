@@ -12,7 +12,7 @@
 
 # Navigate to user home where "${TRAIN_PY}" is accessible
 # scripts/coop_LMC -> scripts -> mergetune -> MERGETUNE -> home
-HERE="$(cd "${HERE}" && pwd)"
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${HERE}/../env.sh"
 
 TRAINER=KgCoOp_COOP_LMC

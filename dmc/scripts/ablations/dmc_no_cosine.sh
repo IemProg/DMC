@@ -3,7 +3,7 @@
 # Ablation: λ_gen=0 (remove R entirely from DMC)
 # Usage: bash dmc_no_cosine.sh <DATASET>
 
-HERE="$(cd "${HERE}" && pwd)"
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${HERE}/../env.sh"
 
 DATASET=$1

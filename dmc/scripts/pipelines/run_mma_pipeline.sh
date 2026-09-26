@@ -6,7 +6,7 @@
 # Usage: bash run_mma_pipeline.sh <DATASET>
 # Example: bash run_mma_pipeline.sh caltech101
 
-HERE="$(cd "${HERE}" && pwd)"
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${HERE}/../env.sh"
 
 DATASET=$1

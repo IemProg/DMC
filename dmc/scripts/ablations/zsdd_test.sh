@@ -5,7 +5,7 @@
 # Usage:
 #   bash zsdd_test.sh <DATASET> <CLIP_W> <W_LMC> <ZSDD_W> <ZSDD_TAU> <SEED> <CFG>
 
-HERE="$(cd "${HERE}" && pwd)"
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${HERE}/../env.sh"
 
 TRAINER=KgCoOp_COOP_LMC

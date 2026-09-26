@@ -1,6 +1,12 @@
 # DMC: Decoupled Mode Connectivity
 
 **Decoupled Mode Connectivity for Base-to-Novel Generalization in Vision-Language Models**
+(NeurIPS 2026)
+
+[![Project page](https://img.shields.io/badge/Project-Page-756BB1)](https://iemprog.github.io/DMC/)
+[![Venue](https://img.shields.io/badge/NeurIPS-2026-3182BD)](https://iemprog.github.io/DMC/)
+[![Paper](https://img.shields.io/badge/Paper-coming%20soon-lightgrey)](#citation)
+[![Python](https://img.shields.io/badge/python-3.8-blue)](#installation)
 
 [Imad Eddine Marouf](https://iemprog.github.io/), Khalid Oublal,
 [Enzo Tartaglione](https://enzotarta.github.io/),
@@ -8,7 +14,28 @@
 
 Télécom Paris, Institut Polytechnique de Paris, France
 
+**Project page:** https://iemprog.github.io/DMC/
+
 ---
+
+## Intuition in 30 seconds
+
+- **The problem.** Fine-tuning CLIP's prompt on base classes raises base accuracy
+  (69.3 → 82.7 for CoOp, 11-dataset average) but lowers novel accuracy
+  (74.2 → 63.2): the harmonic mean does not move.
+- **Why better losses don't fix it.** Existing fixes add a regularizer that pulls
+  the prompt back toward zero-shot CLIP. With one shared prompt, the
+  cross-entropy gradient and the regularizer gradient are antiparallel at
+  convergence (measured `γ = cos(∇L_CE, ∇R) < 0` on all 8 dataset-baseline pairs,
+  ≈ −0.95 on Flowers). Seven alternative single-prompt losses gain at most
+  +0.40 HM, about what retuning `λ` gives.
+- **The idea.** Give each objective its own prompt: `c_spec` specializes,
+  `c_gen` stays near zero-shot. Train a linear-mode-connectivity *corridor* in
+  text-feature space so every classifier between them has low loss, then deploy
+  one point on it (`α = 0.20`). No extra inference cost.
+- **When it helps.** Only if the two endpoints stay separated after training
+  (`cos(f_gen, f_spec)` = 0.600 for CoOp, 0.719 for KgCoOp). With MMA's small
+  adapter they collapse (0.993), and DMC cannot help much.
 
 ## Abstract
 
@@ -32,8 +59,12 @@ base-novel boundary, and prove via Fano's inequality that any CPI violation
 lower-bounds the drop in novel accuracy by a term proportional to the mutual
 information between the prompt and base-class labels. DMC improves base and novel
 accuracy on the majority of dataset-baseline combinations across 11 datasets and
-three prompt-learning baselines (CoOp, KgCoOp, MMA), shifting the Pareto frontier
-rather than trading along it.
+two prompt-tuning baselines (CoOp, KgCoOp), averaged over 3 seeds, shifting the
+Pareto frontier rather than trading along it. We further identify the condition
+under which the method composes with a given parameter-efficient baseline: the
+two endpoints must stay geometrically separated after joint training. The
+condition holds for prompt tuning and for text-encoder LoRA, and fails for the
+adapter-based MMA, where the endpoints collapse and the corridor degenerates.
 
 ---
 
@@ -84,7 +115,9 @@ single-prompt method.
 
 ## Results
 
-Base-to-novel generalization, harmonic mean (HM) over 11 datasets:
+Base-to-novel generalization, harmonic mean (HM) over 11 datasets. MergeTune and
+DMC rows are **3-seed means** at `α = 0.20`; the other rows are the published
+single-run numbers.
 
 | Method | Avg | IN | Cal | Pets | Cars | Flo | Food | Air | SUN | DTD | Euro | UCF |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -93,17 +126,20 @@ Base-to-novel generalization, harmonic mean (HM) over 11 datasets:
 | KgCoOp | 77.01 | 72.78 | 96.03 | 96.18 | 73.36 | 83.65 | 91.10 | 34.83 | 78.36 | 64.35 | 73.48 | 79.66 |
 | MMA | 79.87 | 74.02 | 96.15 | 96.72 | 75.70 | 85.48 | 90.71 | 38.33 | 80.38 | 73.38 | 83.87 | 82.20 |
 | | | | | | | | | | | | | |
-| CoOp + MergeTune | 77.24 | 72.81 | 96.25 | 96.40 | 73.49 | 83.51 | 91.15 | 35.24 | 78.22 | 65.93 | 73.40 | 80.14 |
-| **CoOp + DMC** | **79.04** | 72.90 | 96.84 | 96.82 | 76.88 | 85.82 | 91.42 | 37.76 | 79.62 | 65.98 | 79.26 | 82.74 |
-| KgCoOp + MergeTune | 77.98 | 72.75 | 96.37 | 96.53 | 74.17 | 84.20 | 91.17 | 36.07 | 78.87 | 66.75 | 77.22 | 80.45 |
-| **KgCoOp + DMC** | **78.61** | 73.09 | 96.56 | 96.61 | 76.66 | 84.72 | 91.37 | 35.46 | 79.17 | 66.67 | 80.56 | 80.56 |
-| MMA + MergeTune | 72.76 | 71.27 | 95.93 | 93.34 | 70.33 | 75.55 | 90.22 | 32.80 | 76.88 | 58.85 | 59.95 | 73.73 |
-| **MMA + DMC** | **73.79** | 73.64 | 95.93 | 93.49 | 70.76 | 77.23 | 90.43 | 33.51 | 77.90 | 60.11 | 61.22 | 76.01 |
+| CoOp + MergeTune | 76.45 | 72.89 | 96.27 | 96.13 | 73.38 | 83.92 | 91.05 | 33.33 | 77.85 | 64.26 | 73.45 | 78.42 |
+| **CoOp + DMC** | **77.23** | 72.90 | 96.41 | 96.04 | 75.21 | 84.47 | 91.13 | 35.23 | 78.75 | 63.53 | 75.75 | 80.07 |
+| KgCoOp + MergeTune | 76.43 | 72.82 | 95.94 | 96.28 | 74.90 | 83.39 | 91.08 | 34.10 | 78.03 | 62.66 | 73.44 | 78.08 |
+| **KgCoOp + DMC** | **76.76** | 73.09 | 96.11 | 96.23 | 75.38 | 83.67 | 91.19 | 33.17 | 78.85 | 64.34 | 73.38 | 78.90 |
+| MMA + MergeTune | 72.58 | 73.15 | 95.75 | 93.22 | 70.16 | 75.22 | 90.18 | 32.72 | 76.70 | 58.07 | 59.57 | 73.59 |
+| MMA + DMC | 73.16 | 72.90 | 95.74 | 93.38 | 70.51 | 76.37 | 90.33 | 33.10 | 77.12 | 59.62 | 60.57 | 75.11 |
 
-DMC improves over the MergeTune continued fine-tuning stage on 10/10 non-ImageNet
-datasets for CoOp (+1.94 HM average), 8/10 for KgCoOp (+0.65), and 9/10 for MMA
-(+0.90). Training-free merging (TIES, DARE) reduces HM relative to the fine-tuned
-baseline in every case; see the paper for those rows.
+Over the single-prompt MergeTune stage, DMC raises average HM by **+0.78**
+(CoOp) and **+0.33** (KgCoOp), improving on 8/10 and 7/10 non-ImageNet datasets
+respectively; the few drops (at most 0.93 HM) are within seed spread. On MMA
+the two endpoints collapse (`cos(f_gen, f_spec) = 0.993`), so the corridor
+degenerates: MMA + DMC edges out MMA + MergeTune but both trail the published
+MMA. Training-free merging (TIES, DARE) lowers HM for every base method; see the
+paper for those rows.
 
 ---
 
@@ -113,7 +149,7 @@ Built on [Dassl.pytorch](https://github.com/KaiyangZhou/Dassl.pytorch) and the
 [CoOp](https://github.com/KaiyangZhou/CoOp) codebase.
 
 ```bash
-git clone <repository-url> DMC
+git clone https://github.com/IemProg/DMC.git
 cd DMC
 
 # 1. Environment
@@ -290,16 +326,14 @@ the single-prompt ceiling — are `single_prompt_va_*`, `zsdd_*`, `kl_path_*`,
 
 ## Citation
 
-The paper is currently under review; the venue and DOI will be added once it is
-published.
-
 ```bibtex
-@article{marouf2026dmc,
-  title   = {Decoupled Mode Connectivity for Base-to-Novel Generalization
-             in Vision-Language Models},
-  author  = {Marouf, Imad Eddine and Oublal, Khalid and
-             Tartaglione, Enzo and Lathuili{\`e}re, St{\'e}phane},
-  year    = {2026}
+@inproceedings{marouf2026dmc,
+  title     = {Decoupled Mode Connectivity for Base-to-Novel
+               Generalization in Vision-Language Models},
+  author    = {Marouf, Imad Eddine and Oublal, Khalid and
+               Tartaglione, Enzo and Lathuili{\`e}re, St{\'e}phane},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  year      = {2026}
 }
 ```
 

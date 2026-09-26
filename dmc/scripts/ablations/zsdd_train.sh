@@ -9,7 +9,7 @@
 #   bash zsdd_train.sh caltech101 10.0 1.0 1.0 2.0 1 vit_b16_ep100_ctxv1
 #   bash zsdd_train.sh oxford_flowers 10.0 1.0 2.0 4.0 1 vit_b16_ep100_ctxv1
 
-HERE="$(cd "${HERE}" && pwd)"
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${HERE}/../env.sh"
 
 TRAINER=KgCoOp_COOP_LMC

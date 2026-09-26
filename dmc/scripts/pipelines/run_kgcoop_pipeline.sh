@@ -6,7 +6,7 @@
 # Runs all 3 seeds. Each stage skips if output already exists.
 # KgCoOp Stage 1 uses W=8.0 (the KgCoOp regularization weight).
 
-HERE="$(cd "${HERE}" && pwd)"
+HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "${HERE}/../env.sh"
 
 DATASET=$1
