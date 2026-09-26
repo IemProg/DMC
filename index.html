@@ -70,7 +70,7 @@
           <text id="hTxS" class="alabel f-spec" text-anchor="middle">cross-entropy</text>
           <text id="hTxG" class="alabel f-gen" text-anchor="middle">anchor <tspan font-style="italic" font-family="var(--serif)">R</tspan></text>
         </g>
-        <text id="hLam" class="lamlabel" text-anchor="middle"></text>
+        <text id="hLam" class="lamlabel" text-anchor="end"></text>
         <circle id="hGen" r="8" class="pt f-gen"/>
         <circle id="hSpec" r="8" class="pt f-spec"/>
         <circle id="hOne" r="8.5" class="pt f-ink"/>
@@ -111,14 +111,16 @@
     </div>
   </div>
   <figcaption class="steps">
+    <div class="stepbar">
     <ol>
-      <li data-step="0"><button type="button">One prompt, two pulls</button></li>
-      <li data-step="1"><button type="button"><span class="it">λ</span> slides along one curve</button></li>
+      <li data-step="0"><button type="button">One prompt</button></li>
+      <li data-step="1"><button type="button">Varying <span class="it">λ</span></button></li>
       <li data-step="2"><button type="button">Two prompts</button></li>
-      <li data-step="3"><button type="button">A point beyond the curve</button></li>
+      <li data-step="3"><button type="button">Beyond the curve</button></li>
     </ol>
+    <button type="button" id="replay" class="replay" aria-label="Replay the animation"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M13 8a5 5 0 1 1-1.6-3.7M13 2.5v3h-3" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Replay</button>
+    </div>
     <p id="stepText" class="steptext" aria-live="polite"></p>
-    <button type="button" id="replay" class="textbtn">Replay</button>
   </figcaption>
 </figure>
 

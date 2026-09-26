@@ -59,7 +59,7 @@
       "A single prompt receives both gradients and settles where they cancel: one point on the accuracy plane.",
       "Changing λ only moves the prompt along the line between the two goals. Every λ lands on the same trade-off curve.",
       "DMC gives each objective its own prompt. Each one moves toward its own goal.",
-      "A corridor joins them. Its classifiers trace a curve beyond the single-prompt one; we deploy α = 0.20."
+      "A corridor joins them. Its classifiers trace a curve beyond the single-prompt one; we deploy α\u00a0=\u00a00.20."
     ];
     // timeline (ms)
     var T = [0, 2600, 7400, 9300, 13200], END = 13200;
@@ -96,8 +96,8 @@
       set(e.hOne, { cx: c.x, cy: c.y, opacity: oneA });
       set(e.hOneL, { x: c.x - px * 22, y: c.y - py * 22 + 7, opacity: oneA });
       var lamA = t >= T[1] && t < T[2] ? clamp((t - T[1]) / 300) * (1 - clamp((t - T[2] + 300) / 300)) : 0;
-      set(e.hLam, { x: c.x + px * 30, y: c.y + py * 30 + 8, opacity: lamA });
-      e.hLam.textContent = s < 0.4 ? "large λ" : s > 0.6 ? "small λ" : "";
+      set(e.hLam, { x: 462, y: 322, opacity: lamA });
+      e.hLam.textContent = s < 0.4 ? "large λ: closer to zero-shot" : s > 0.6 ? "small λ: closer to base optimum" : "λ";
       // ---- DMC prompts ----
       var g = P(c, Gp, split), sp = P(c, Sp, split);
       var dA = t >= T[2] ? 1 : 0;
