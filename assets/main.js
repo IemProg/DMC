@@ -21,74 +21,141 @@
   }
   window.addEventListener("load", renderMath);
 
-  /* ---------- hero animation ---------- */
+  /* ---------- hero animation: prompt space (left) + accuracy plane (right) ---------- */
   (function hero() {
-    var svg = $("heroSvg"); if (!svg) return;
-    var G = { x: 92, y: 190 }, S = { x: 508, y: 88 };
-    var M = { x: 300, y: 139 };
-    var Gp = { x: 150, y: 176 }, Sp = { x: 450, y: 102 };
+    var L = $("hL"), R = $("hR"); if (!L || !R) return;
+    var NS = "http://www.w3.org/2000/svg";
+    var set = function (e, a) { for (var k in a) e.setAttribute(k, a[k]); };
+    var P = function (a, b, t) { return { x: lerp(a.x, b.x, t), y: lerp(a.y, b.y, t) }; };
+    // left: goals and the line joining them
+    var G = { x: 72, y: 262 }, S = { x: 408, y: 82 };
+    var onLine = function (s) { return P(G, S, 0.14 + 0.72 * s); };      // single prompt at position s (0 = zero-shot side)
+    var Gp = P(G, S, 0.10), Sp = P(G, S, 0.90);                            // DMC endpoints
     var ux = S.x - G.x, uy = S.y - G.y, ul = Math.hypot(ux, uy); ux /= ul; uy /= ul;
     var px = -uy, py = ux;
-    var one = $("hOne"), oneL = $("hOneL"), gen = $("hGen"), spec = $("hSpec"), genL = $("hGenL"), specL = $("hSpecL");
-    var arS = $("hArS"), arG = $("hArG"), txS = $("hTxS"), txG = $("hTxG"), arrows = $("hArrows");
-    var corr = $("hCorr"), band = $("hBand"), line = $("hLine"), star = $("hStar");
-    var steps = document.querySelectorAll(".steps li");
-    var T1 = 2600, T2 = 4100, T3 = 5500;
-    var set = function (e, a) { for (var k in a) e.setAttribute(k, a[k]); };
-    var t0 = null, raf = null;
-
-    function step(i) { for (var k = 0; k < steps.length; k++) steps[k].classList.toggle("on", k === i); }
-
+    // right: accuracy plane (schematic)
+    var X = function (u) { return 60 + u * 400; }, Y = function (v) { return 300 - v * 280; };
+    var front = function (s) { var th = s * Math.PI / 2; return { x: X(0.10 + 0.66 * Math.sin(th)), y: Y(0.10 + 0.66 * Math.cos(th)) }; };
+    var dmc = function (a) { var th = Math.pow(a, 0.5) * Math.PI / 2; return { x: X(0.14 + 0.76 * Math.sin(th)), y: Y(0.14 + 0.76 * Math.cos(th)) }; };
+    var path = function (f, a0, a1, n) { var d = ""; n = n || 60; for (var k = 0; k <= n; k++) { var q = f(lerp(a0, a1, k / n)); d += (k ? "L" : "M") + q.x.toFixed(1) + " " + q.y.toFixed(1); } return d; };
+    // iso-HM contours: v = h u / (2u - h)
+    (function iso() {
+      var g = $("hIso");
+      [0.35, 0.5, 0.65, 0.8].forEach(function (h) {
+        var d = "", first = true;
+        for (var k = 0; k <= 80; k++) {
+          var u = h / 2 + 0.0015 + (1.2 - h / 2) * Math.pow(k / 80, 1.8), v = h * u / (2 * u - h);
+          if (v > 1.3) continue;
+          d += (first ? "M" : "L") + X(u).toFixed(1) + " " + Y(v).toFixed(1); first = false;
+        }
+        var p = document.createElementNS(NS, "path"); p.setAttribute("d", d); p.setAttribute("class", "iso"); g.appendChild(p);
+      });
+    })();
+    var $$ = function (ids) { var o = {}; ids.split(" ").forEach(function (k) { o[k] = $(k); }); return o; };
+    var e = $$("rOneL hRail hCorr hArrows hArS hArG hTxS hTxG hLam hGen hSpec hOne hTrav hOneL hGenL hSpecL hStarL hStarLt hFront hDmc hFrontT hDmcT hShift hShiftT rGen rSpec rOne rTrav hStarR");
+    set(e.hRail, { x1: G.x, y1: G.y, x2: S.x, y2: S.y });
+    var stepsLi = document.querySelectorAll(".steps li"), stepText = $("stepText");
+    var TEXT = [
+      "A single prompt receives both gradients and settles where they cancel: one point on the accuracy plane.",
+      "Changing λ only moves the prompt along the line between the two goals. Every λ lands on the same trade-off curve.",
+      "DMC gives each objective its own prompt. Each one moves toward its own goal.",
+      "A corridor joins them. Its classifiers trace a curve beyond the single-prompt one; we deploy α = 0.20."
+    ];
+    // timeline (ms)
+    var T = [0, 2600, 7400, 9300, 13200], END = 13200;
+    var sOf = function (t) {                    // position of the single prompt during the lambda sweep
+      if (t < T[1]) return 0.5;
+      var k = clamp((t - T[1]) / (T[2] - T[1] - 300));
+      var keys = [0.5, 0.06, 0.94, 0.5], seg = Math.min(2, Math.floor(k * 3)), f = ease(k * 3 - seg);
+      return lerp(keys[seg], keys[seg + 1], f);
+    };
+    var sMin = 0.5, sMax = 0.5, cur = -1;
+    function stage(t) { return t < T[1] ? 0 : t < T[2] ? 1 : t < T[3] ? 2 : 3; }
     function frame(t) {
-      // phase A: one prompt, jittering at the compromise
-      var jig = t < T1 + 400 ? 1 : 0;
-      var w = Math.sin(t * 0.0105) * 0.6 + Math.sin(t * 0.0231) * 0.4;
-      var P = { x: M.x + ux * 4 * w + px * 1.6 * Math.sin(t * 0.017), y: M.y + uy * 4 * w + py * 1.6 * Math.sin(t * 0.017) };
-      var split = ease((t - T1) / (T2 - T1));
-      var fadeA = 1 - clamp((t - T1) / 450);
-      var LS = 104 + 9 * w, LG = 104 - 9 * w;
-      set(arS, { x1: P.x + ux * 13, y1: P.y + uy * 13, x2: P.x + ux * LS, y2: P.y + uy * LS });
-      set(arG, { x1: P.x - ux * 13, y1: P.y - uy * 13, x2: P.x - ux * LG, y2: P.y - uy * LG });
-      set(txS, { x: M.x + ux * 70 - px * 22, y: M.y + uy * 70 - py * 22 });
-      set(txG, { x: M.x - ux * 70 + px * 22, y: M.y - uy * 70 + py * 22 + 12 });
-      arrows.setAttribute("opacity", fadeA);
-      // points
-      var g = { x: lerp(P.x, Gp.x, split), y: lerp(P.y, Gp.y, split) };
-      var s = { x: lerp(P.x, Sp.x, split), y: lerp(P.y, Sp.y, split) };
-      var splitting = t >= T1;
-      set(one, { cx: P.x, cy: P.y, opacity: splitting ? 0 : 1 });
-      set(oneL, { x: P.x, y: P.y - 20, opacity: splitting ? 0 : 1 });
-      set(gen, { cx: g.x, cy: g.y, opacity: splitting ? 1 : 0 });
-      set(spec, { cx: s.x, cy: s.y, opacity: splitting ? 1 : 0 });
-      var lab = clamp((t - T2 + 500) / 500);
-      set(genL, { x: g.x, y: g.y - 20, opacity: lab });
-      set(specL, { x: s.x, y: s.y + 34, opacity: lab });
-      set(band, { x1: g.x, y1: g.y, x2: s.x, y2: s.y });
-      set(line, { x1: g.x, y1: g.y, x2: s.x, y2: s.y });
-      corr.setAttribute("opacity", clamp((t - T1 - 250) / 900));
-      // star slides from c_gen to alpha = 0.2
-      var st = ease((t - T2 - 150) / (T3 - T2 - 150));
-      var a = 0.2 * st, sx = lerp(g.x, s.x, a), sy = lerp(g.y, s.y, a);
-      star.setAttribute("transform", "translate(" + sx + "," + sy + ")");
-      star.setAttribute("opacity", clamp((t - T2 - 150) / 300));
-      step(t < T1 ? 0 : t < T2 ? 1 : 2);
-      return jig;
+      var st = stage(t);
+      if (st !== cur) {
+        cur = st;
+        for (var k = 0; k < stepsLi.length; k++) stepsLi[k].classList.toggle("on", k === st);
+        stepText.textContent = TEXT[st];
+      }
+      // ---- single prompt ----
+      var s = sOf(t);
+      if (t >= T[1] && t < T[2]) { sMin = Math.min(sMin, s); sMax = Math.max(sMax, s); }
+      if (t < T[1]) { sMin = sMax = 0.5; }
+      if (t >= T[2]) { sMin = 0.06; sMax = 0.94; }
+      var w = t < T[1] ? Math.sin(t * 0.0105) * 0.6 + Math.sin(t * 0.0231) * 0.4 : 0;
+      var c = onLine(s); c = { x: c.x + ux * 4 * w, y: c.y + uy * 4 * w };
+      var split = ease((t - T[2]) / 1500);
+      var oneA = t < T[2] ? 1 : 0;
+      var arrA = 1 - clamp((t - T[2]) / 400);
+      set(e.hArS, { x1: c.x + ux * 13, y1: c.y + uy * 13, x2: c.x + ux * (70 + 7 * w), y2: c.y + uy * (70 + 7 * w) });
+      set(e.hArG, { x1: c.x - ux * 13, y1: c.y - uy * 13, x2: c.x - ux * (70 - 7 * w), y2: c.y - uy * (70 - 7 * w) });
+      set(e.hTxS, { x: c.x + ux * 48 - px * 22, y: c.y + uy * 48 - py * 22 });
+      set(e.hTxG, { x: c.x - ux * 48 + px * 22, y: c.y - uy * 48 + py * 22 + 12 });
+      e.hArrows.setAttribute("opacity", arrA);
+      set(e.hOne, { cx: c.x, cy: c.y, opacity: oneA });
+      set(e.hOneL, { x: c.x - px * 22, y: c.y - py * 22 + 7, opacity: oneA });
+      var lamA = t >= T[1] && t < T[2] ? clamp((t - T[1]) / 300) * (1 - clamp((t - T[2] + 300) / 300)) : 0;
+      set(e.hLam, { x: c.x + px * 30, y: c.y + py * 30 + 8, opacity: lamA });
+      e.hLam.textContent = s < 0.4 ? "large λ" : s > 0.6 ? "small λ" : "";
+      // ---- DMC prompts ----
+      var g = P(c, Gp, split), sp = P(c, Sp, split);
+      var dA = t >= T[2] ? 1 : 0;
+      set(e.hGen, { cx: g.x, cy: g.y, opacity: dA }); set(e.hSpec, { cx: sp.x, cy: sp.y, opacity: dA });
+      var labA = clamp((t - T[2] - 900) / 500);
+      set(e.hGenL, { x: g.x - px * 24, y: g.y - py * 24 + 7, opacity: labA });
+      set(e.hSpecL, { x: sp.x + px * 26, y: sp.y + py * 26 + 7, opacity: labA });
+      // corridor draw + traveler (stage 3), then star settles at alpha = 0.2
+      var draw = clamp((t - T[3]) / 700);
+      var ce = P(Gp, Sp, draw);
+      set(e.hCorr, { x1: Gp.x, y1: Gp.y, x2: ce.x, y2: ce.y, opacity: t >= T[3] ? 1 : 0 });
+      var trav = clamp((t - T[3] - 500) / 1900);            // alpha 0 -> 1
+      var starK = ease((t - T[3] - 2500) / 900);             // alpha 1 -> 0.2
+      var alpha = t < T[3] + 2500 ? ease(trav) : lerp(1, 0.2, starK);
+      var travOn = t >= T[3] + 500 && t < T[3] + 2500;
+      var q = P(Gp, Sp, alpha);
+      set(e.hTrav, { cx: q.x, cy: q.y, opacity: travOn ? 1 : 0 });
+      var starOn = t >= T[3] + 2500 ? 1 : 0;
+      e.hStarL.setAttribute("transform", "translate(" + q.x + "," + q.y + ")"); e.hStarL.setAttribute("opacity", starOn);
+      set(e.hStarLt, { x: q.x + px * 30, y: q.y + py * 30 + 10, opacity: clamp((t - T[3] - 3200) / 300) });
+      // ---- right panel ----
+      e.hFront.setAttribute("d", path(front, sMin, sMax));
+      e.hFront.setAttribute("opacity", t >= T[1] ? 1 : 0);
+      var fl = front(0.06); set(e.hFrontT, { x: 72, y: fl.y + 46, opacity: clamp((t - T[2] + 600) / 500) });
+      var f = front(s); set(e.rOne, { cx: f.x, cy: f.y });
+      set(e.rOneL, { x: f.x - 16, y: f.y - 12, opacity: t < T[3] + 3300 ? 1 : 0 });
+      var d0 = dmc(0), d1 = dmc(1);
+      var r0 = P(f, d0, split), r1 = P(f, d1, split);
+      set(e.rGen, { cx: r0.x, cy: r0.y, opacity: dA }); set(e.rSpec, { cx: r1.x, cy: r1.y, opacity: dA });
+      var dmcTo = t < T[3] + 2500 ? ease(trav) : 1;
+      e.hDmc.setAttribute("d", dmcTo > 0.002 ? path(dmc, 0, dmcTo, 80) : "");
+      set(e.hDmcT, { x: dmc(0).x + 14, y: dmc(0).y - 12, opacity: clamp((t - T[3] - 1800) / 500) });
+      var rq = dmc(alpha);
+      set(e.rTrav, { cx: rq.x, cy: rq.y, opacity: travOn ? 1 : 0 });
+      e.hStarR.setAttribute("transform", "translate(" + rq.x + "," + rq.y + ")"); e.hStarR.setAttribute("opacity", starOn);
+      var shA = clamp((t - T[3] - 3300) / 500), fm = front(0.5), sr = dmc(0.2);
+      var sh = P(fm, sr, 0.82);
+      set(e.hShift, { x1: fm.x + 7, y1: fm.y - 7, x2: lerp(fm.x + 7, sh.x, shA), y2: lerp(fm.y - 7, sh.y, shA), opacity: shA > 0 ? 1 : 0 });
+      set(e.hShiftT, { x: fm.x - 12, y: fm.y + 24, opacity: clamp((t - T[3] - 3700) / 400) });
     }
+    var t0 = null, raf = null, off = 0;
     function loop(now) {
-      if (t0 === null) t0 = now;
-      var t = now - t0;
-      frame(t);
-      if (t < T3 + 50) raf = requestAnimationFrame(loop); else raf = null;
+      if (t0 === null) t0 = now - off;
+      var t = now - t0; frame(t);
+      if (t < END + 3000) raf = requestAnimationFrame(loop); else raf = null;
     }
-    function play() {
-      if (reduce) { frame(T3 + 100); for (var k = 0; k < steps.length; k++) steps[k].classList.add("on"); return; }
+    function playFrom(k) {
       if (raf) cancelAnimationFrame(raf);
-      t0 = null; raf = requestAnimationFrame(loop);
+      cur = -1;
+      if (reduce) { frame(END + 3000); return; }
+      off = T[k]; if (k >= 2) { sMin = 0.06; sMax = 0.94; } t0 = null; raf = requestAnimationFrame(loop);
     }
     frame(0);
-    if (reduce) { play(); } else { setTimeout(play, 350); }
-    $("replay").addEventListener("click", play);
-    svg.addEventListener("click", play);
+    var started = false;
+    onVisible($("teaser"), function () { if (!started) { started = true; setTimeout(function () { playFrom(0); }, reduce ? 0 : 250); } }, 0.35);
+    $("replay").addEventListener("click", function () { playFrom(0); });
+    [L, R].forEach(function (s) { s.addEventListener("click", function () { playFrom(0); }); });
+    stepsLi.forEach(function (li) { li.querySelector("button").addEventListener("click", function () { playFrom(+li.dataset.step); }); });
     if (reduce) $("replay").hidden = true;
   })();
 

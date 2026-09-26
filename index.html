@@ -49,48 +49,75 @@
 <main>
 
 <figure class="teaser" id="teaser">
-  <svg id="heroSvg" viewBox="0 0 600 270" role="img" aria-labelledby="heroTitle heroDesc">
-    <title id="heroTitle">From one prompt to two prompts joined by a corridor</title>
-    <desc id="heroDesc">A single prompt c is pulled toward the base-class optimum by cross-entropy and toward zero-shot features by the anchor R, and stalls between them. It then splits into two prompts, c_spec and c_gen, each moving toward its own goal. A corridor joins them, and a star marks the deployed classifier at alpha equal to 0.20.</desc>
-    <defs>
-      <marker id="hdS" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" class="f-spec"/></marker>
-      <marker id="hdG" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" class="f-gen"/></marker>
-    </defs>
-    <g class="goal gen">
-      <circle cx="92" cy="190" r="36" class="ring"/><circle cx="92" cy="190" r="23" class="ring"/><circle cx="92" cy="190" r="10" class="ring"/>
-      <text x="56" y="252" text-anchor="start" class="glabel">zero-shot features</text>
-    </g>
-    <g class="goal spec">
-      <circle cx="508" cy="88" r="36" class="ring"/><circle cx="508" cy="88" r="23" class="ring"/><circle cx="508" cy="88" r="10" class="ring"/>
-      <text x="544" y="34" text-anchor="end" class="glabel">base-class optimum</text>
-    </g>
-    <g id="hCorr" opacity="0">
-      <line id="hBand" class="band"/>
-      <line id="hLine" class="corr-line"/>
-    </g>
-    <g id="hArrows">
-      <line id="hArS" class="arrow s-spec" marker-end="url(#hdS)"/>
-      <line id="hArG" class="arrow s-gen" marker-end="url(#hdG)"/>
-      <text id="hTxS" class="alabel f-spec" text-anchor="middle">cross-entropy</text>
-      <text id="hTxG" class="alabel f-gen" text-anchor="middle">anchor <tspan font-style="italic" font-family="var(--serif)">R</tspan></text>
-    </g>
-    <circle id="hGen" r="8" class="pt f-gen" opacity="0"/>
-    <circle id="hSpec" r="8" class="pt f-spec" opacity="0"/>
-    <circle id="hOne" r="8.5" class="pt f-ink"/>
-    <text id="hOneL" class="mlabel" text-anchor="middle"><tspan font-style="italic">c</tspan></text>
-    <text id="hGenL" class="mlabel f-gen" text-anchor="middle" opacity="0"><tspan font-style="italic">c</tspan><tspan class="sub" dy="5">gen</tspan></text>
-    <text id="hSpecL" class="mlabel f-spec" text-anchor="middle" opacity="0"><tspan font-style="italic">c</tspan><tspan class="sub" dy="5">spec</tspan></text>
-    <g id="hStar" opacity="0">
-      <path class="star" d="M0,-12 L3.5,-4.2 L11.4,-3.7 L5.3,1.6 L7.1,9.7 L0,5.4 L-7.1,9.7 L-5.3,1.6 L-11.4,-3.7 L-3.5,-4.2Z"/>
-      <text y="32" text-anchor="middle" class="slabel"><tspan font-style="italic">α</tspan> = 0.20</text>
-    </g>
-  </svg>
+  <div class="duo">
+    <div class="panel">
+      <div class="ptitle">Prompt</div>
+      <svg id="hL" viewBox="0 0 480 340" role="img" aria-labelledby="hLt">
+        <title id="hLt">Prompts between the zero-shot goal and the base-class goal</title>
+        <defs>
+          <marker id="hdS" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" class="f-spec"/></marker>
+          <marker id="hdG" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" class="f-gen"/></marker>
+        </defs>
+        <line id="hRail" class="rail"/>
+        <g class="goal gen"><circle cx="72" cy="262" r="34" class="ring"/><circle cx="72" cy="262" r="21" class="ring"/><circle cx="72" cy="262" r="9" class="ring"/>
+          <text x="40" y="322" class="glabel">zero-shot features</text></g>
+        <g class="goal spec"><circle cx="408" cy="82" r="34" class="ring"/><circle cx="408" cy="82" r="21" class="ring"/><circle cx="408" cy="82" r="9" class="ring"/>
+          <text x="440" y="30" text-anchor="end" class="glabel">base-class optimum</text></g>
+        <line id="hCorr" class="corr-line"/>
+        <g id="hArrows">
+          <line id="hArS" class="arrow s-spec" marker-end="url(#hdS)"/>
+          <line id="hArG" class="arrow s-gen" marker-end="url(#hdG)"/>
+          <text id="hTxS" class="alabel f-spec" text-anchor="middle">cross-entropy</text>
+          <text id="hTxG" class="alabel f-gen" text-anchor="middle">anchor <tspan font-style="italic" font-family="var(--serif)">R</tspan></text>
+        </g>
+        <text id="hLam" class="lamlabel" text-anchor="middle"></text>
+        <circle id="hGen" r="8" class="pt f-gen"/>
+        <circle id="hSpec" r="8" class="pt f-spec"/>
+        <circle id="hOne" r="8.5" class="pt f-ink"/>
+        <circle id="hTrav" r="5" class="pt f-corr"/>
+        <text id="hOneL" class="mlabel" text-anchor="middle"><tspan font-style="italic">c</tspan></text>
+        <text id="hGenL" class="mlabel f-gen" text-anchor="middle"><tspan font-style="italic">c</tspan><tspan class="sub" dy="5">gen</tspan></text>
+        <text id="hSpecL" class="mlabel f-spec" text-anchor="middle"><tspan font-style="italic">c</tspan><tspan class="sub" dy="5">spec</tspan></text>
+        <path id="hStarL" class="star" d="M0,-12 L3.5,-4.2 L11.4,-3.7 L5.3,1.6 L7.1,9.7 L0,5.4 L-7.1,9.7 L-5.3,1.6 L-11.4,-3.7 L-3.5,-4.2Z"/>
+        <text id="hStarLt" class="slabel" text-anchor="middle"><tspan font-style="italic">α</tspan> = 0.20</text>
+      </svg>
+    </div>
+    <div class="panel">
+      <div class="ptitle">Accuracy <span class="schem">schematic</span></div>
+      <svg id="hR" viewBox="0 0 480 340" role="img" aria-labelledby="hRt">
+        <title id="hRt">Base versus novel accuracy: one prompt slides along a single trade-off curve, the DMC corridor traces a curve beyond it</title>
+        <defs>
+          <marker id="hdA" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" class="f-good"/></marker>
+          <clipPath id="hClip"><rect x="60" y="20" width="400" height="280"/></clipPath>
+        </defs>
+        <g id="hIso" clip-path="url(#hClip)"></g>
+        <text x="452" y="36" text-anchor="end" class="isolabel">higher HM ↗</text>
+        <path class="axis" d="M60 20 V300 H460"/>
+        <text x="460" y="326" text-anchor="end" class="axlabel">base accuracy →</text>
+        <text x="0" y="0" transform="translate(40,300) rotate(-90)" class="axlabel">novel accuracy →</text>
+        <path id="hFront" class="front"/>
+        <path id="hDmc" class="dmc"/>
+        <text id="hFrontT" class="curvelabel c-front">one prompt, every <tspan font-style="italic" font-family="var(--serif)">λ</tspan></text>
+        <text id="hDmcT" class="curvelabel c-dmc">DMC corridor, every <tspan font-style="italic" font-family="var(--serif)">α</tspan></text>
+        <line id="hShift" class="shift" marker-end="url(#hdA)"/>
+        <text id="hShiftT" class="shiftlabel" text-anchor="end">base ↑ novel ↑</text>
+        <circle id="rGen" r="7" class="pt f-gen"/>
+        <circle id="rSpec" r="7" class="pt f-spec"/>
+        <circle id="rOne" r="7.5" class="pt f-ink"/>
+        <text id="rOneL" class="mlabel small" text-anchor="middle"><tspan font-style="italic">c</tspan></text>
+        <circle id="rTrav" r="5" class="pt f-corr"/>
+        <path id="hStarR" class="star" d="M0,-12 L3.5,-4.2 L11.4,-3.7 L5.3,1.6 L7.1,9.7 L0,5.4 L-7.1,9.7 L-5.3,1.6 L-11.4,-3.7 L-3.5,-4.2Z"/>
+      </svg>
+    </div>
+  </div>
   <figcaption class="steps">
-    <ol aria-hidden="true">
-      <li data-step="0" data-n="1">One prompt, opposing pulls</li>
-      <li data-step="1" data-n="2">One prompt per objective</li>
-      <li data-step="2" data-n="3">Corridor, deploy one point</li>
+    <ol>
+      <li data-step="0"><button type="button">One prompt, two pulls</button></li>
+      <li data-step="1"><button type="button"><span class="it">λ</span> slides along one curve</button></li>
+      <li data-step="2"><button type="button">Two prompts</button></li>
+      <li data-step="3"><button type="button">A point beyond the curve</button></li>
     </ol>
+    <p id="stepText" class="steptext" aria-live="polite"></p>
     <button type="button" id="replay" class="textbtn">Replay</button>
   </figcaption>
 </figure>

@@ -10,6 +10,7 @@
   --spec: #D65A31;
   --gen: #3182BD;
   --corr: #756BB1;
+  --good: #2E8B57;
   --neg: #9a9186;
   --serif: "Source Serif 4", "Source Serif Pro", Georgia, serif;
   --sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -29,6 +30,7 @@
     --spec: #E97A52;
     --gen: #62A7DC;
     --corr: #A39BDB;
+    --good: #5DBB84;
     --neg: #8b847b;
     color-scheme: dark;
   }
@@ -85,18 +87,48 @@ h1 {
 .btn em { font-style: normal; font-weight: 400; font-size: .8125rem; }
 
 /* ---------- teaser ---------- */
-.teaser { max-width: 46rem !important; margin: 56px auto 0; }
-.teaser svg { display: block; width: 100%; height: auto; cursor: pointer; }
-.steps { display: flex; align-items: baseline; gap: 16px; margin-top: 6px; font: 400 .8125rem/1.4 var(--sans); color: var(--muted); }
-.steps ol { list-style: none; display: flex; gap: 22px; margin: 0; padding: 0; flex: 1; justify-content: center; counter-reset: s; }
-.steps li { counter-increment: s; transition: color .3s; white-space: nowrap; }
-.steps li::before { content: attr(data-n) "  "; white-space: pre; font-variant-numeric: tabular-nums; }
-.steps li.on { color: var(--ink); }
+.teaser { max-width: var(--wide) !important; margin: 56px auto 0; }
+.duo { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+.panel { background: var(--card); border: 1px solid var(--rule); border-radius: 10px; padding: 14px 14px 8px; }
+.ptitle { font: 600 .75rem/1 var(--sans); letter-spacing: .12em; text-transform: uppercase; color: var(--muted); text-align: left; margin: 2px 0 6px 4px; }
+.ptitle .schem { font-weight: 400; letter-spacing: .04em; text-transform: none; font-style: italic; margin-left: .6em; }
+.teaser svg { display: block; width: 100%; height: auto; cursor: pointer; overflow: visible; }
+.steps { margin-top: 18px; font: 400 .875rem/1.45 var(--sans); color: var(--muted); text-align: center; }
+.steps ol { list-style: none; display: flex; flex-wrap: wrap; justify-content: center; gap: 6px 10px; margin: 0; padding: 0; counter-reset: s; }
+.steps li { counter-increment: s; }
+.steps li button {
+  font: 500 .8125rem/1 var(--sans); color: var(--muted); background: none; cursor: pointer;
+  border: 1px solid var(--rule); border-radius: 999px; padding: 7px 12px; transition: color .25s, border-color .25s, background .25s;
+}
+.steps li button::before { content: counter(s) "  "; white-space: pre; font-variant-numeric: tabular-nums; opacity: .7; }
+.steps li button:hover { color: var(--ink); }
+.steps li.on button { color: var(--ink); border-color: var(--ink-2); background: var(--card); }
+.steps .it { font: italic 400 1.05em var(--serif); }
+.steptext { max-width: 40rem; min-height: 3em; margin: 12px auto 0; font: 400 1rem/1.5 var(--serif); color: var(--ink-2); }
 .textbtn {
   font: 500 .8125rem/1 var(--sans); color: var(--muted); background: none; border: 0; padding: 6px 2px; cursor: pointer;
   text-decoration: underline; text-decoration-color: var(--rule); text-underline-offset: .25em;
 }
 .textbtn:hover { color: var(--ink); }
+.rail { stroke: var(--rule); stroke-width: 1.5; stroke-dasharray: 3 5; }
+.lamlabel { font: italic 400 15px var(--serif); fill: var(--muted); }
+.axis { fill: none; stroke: var(--ink-2); stroke-width: 1.2; }
+.axlabel { font: 400 13px var(--sans); fill: var(--muted); }
+.iso { fill: none; stroke: var(--rule); stroke-width: 1; stroke-dasharray: 2 4; }
+.isolabel { font: 400 12px var(--sans); fill: var(--muted); }
+.front { fill: none; stroke: var(--neg); stroke-width: 3; stroke-linecap: round; }
+.dmc { fill: none; stroke: var(--corr); stroke-width: 3.5; stroke-linecap: round; }
+.curvelabel { font: 500 13px var(--sans); }
+.c-front { fill: var(--neg); } .c-dmc { fill: var(--corr); }
+.shift { stroke: var(--good, #2E8B57); stroke-width: 2.2; stroke-linecap: round; }
+.mlabel.small { font-size: 18px; }
+.shiftlabel { font: 600 13px var(--sans); fill: var(--good, #2E8B57); }
+.f-good { fill: var(--good, #2E8B57); }
+@media (max-width: 760px) {
+  .duo { grid-template-columns: 1fr; gap: 14px; }
+  .teaser .axlabel, .teaser .curvelabel, .teaser .shiftlabel { font-size: 18px; }
+  .teaser .isolabel, .teaser .lamlabel { font-size: 17px; }
+}
 
 .abstract { font-size: 1.3125rem; line-height: 1.55; margin-top: 40px; margin-bottom: 0; color: var(--ink); }
 
@@ -277,8 +309,6 @@ footer p { max-width: var(--measure); margin: 0 auto !important; font: 400 .8125
   h2 { font-size: 1.5rem; }
   .steps { flex-direction: column; align-items: center; gap: 2px; }
   .steps ol { flex-direction: column; align-items: center; gap: 2px; }
-  .steps li { display: none; }
-  .steps li.on { display: block; }
   .aside { grid-template-columns: 1fr; gap: 24px; }
   .heat-wide { display: none; }
   .heat-tall { display: grid; }
