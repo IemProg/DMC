@@ -3,397 +3,248 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>DMC · NeurIPS 2026</title>
-<meta name="description" content="Decoupled Mode Connectivity (DMC): give the specialization and generalization objectives of prompt learning their own prompts, joined by a low-loss corridor in text-feature space. NeurIPS 2026.">
-<meta name="theme-color" content="#fbfbfd" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0e1116" media="(prefers-color-scheme: dark)">
+<title>Decoupled Mode Connectivity (DMC)</title>
+<meta name="description" content="DMC gives the specialization and generalization objectives of CLIP prompt learning their own prompts, joins them with a low-loss linear corridor in text-feature space, and deploys one point on it. NeurIPS 2026.">
 <meta property="og:title" content="Decoupled Mode Connectivity for Base-to-Novel Generalization in Vision-Language Models">
-<meta property="og:description" content="One prompt cannot serve two objectives. Give each its own. NeurIPS 2026.">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://iemprog.github.io/DMC/">
+<meta property="og:description" content="Two prompts joined by a low-loss corridor move the base-novel frontier of CLIP prompt learning. NeurIPS 2026.">
 <meta property="og:image" content="https://iemprog.github.io/DMC/assets/fig1_overview_main.png">
-<meta name="twitter:card" content="summary_large_image">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cline x1='6' y1='22' x2='26' y2='10' stroke='%23756BB1' stroke-width='4' stroke-linecap='round'/%3E%3Ccircle cx='6' cy='22' r='5' fill='%233182BD'/%3E%3Ccircle cx='26' cy='10' r='5' fill='%23D65A31'/%3E%3C/svg%3E">
+<meta name="color-scheme" content="light dark">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" crossorigin="anonymous">
 <link rel="stylesheet" href="assets/style.css">
-<script>
-  // apply saved theme before paint
-  try { var t = localStorage.getItem("dmc-theme"); if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t); } catch (e) {}
-</script>
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
-<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
-<script defer src="assets/main.js"></script>
+<script>document.documentElement.classList.add("js");</script>
 </head>
 <body>
-<a class="skip" href="#main">Skip to content</a>
 
-<nav class="topnav" aria-label="Sections">
-  <div class="wrap">
-    <a class="brand" href="#top"><span class="dot" style="background:var(--gen)"></span><span class="dot" style="background:var(--spec)"></span> DMC</a>
-    <div class="navlinks">
-      <a href="#problem">Problem</a>
-      <a href="#losses">Better losses?</a>
-      <a href="#diagnosis">Diagnosis</a>
-      <a href="#idea">Idea</a>
-      <a href="#training">Training</a>
-      <a href="#evidence">Evidence</a>
-      <a href="#scope">Scope</a>
-      <a href="#bibtex">BibTeX</a>
-    </div>
-    <button class="theme-btn" id="themeBtn" type="button" aria-label="Toggle dark mode">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
-    </button>
-  </div>
-</nav>
+<header class="hero">
+  <p class="venue">NeurIPS 2026</p>
+  <h1>Decoupled Mode Connectivity for Base-to-Novel Generalization in Vision-Language Models</h1>
 
-<header class="hero" id="top">
-  <div class="wrap">
-    <div class="venue">NeurIPS 2026</div>
-    <h1>Decoupled Mode Connectivity<span class="sub">for Base-to-Novel Generalization in Vision-Language Models</span></h1>
-    <div class="authors">
-      <a href="https://iemprog.github.io/">Imad Eddine Marouf</a><sup>1</sup>
-      <span>Khalid Oublal<sup>2</sup></span>
-      <a href="https://enzotarta.github.io/">Enzo Tartaglione</a><sup>1</sup>
-      <a href="https://stelat.eu/">Stéphane Lathuilière</a><sup>1</sup>
-    </div>
-    <div class="affil"><sup>1</sup>Télécom Paris, Institut Polytechnique de Paris &nbsp;&nbsp; <sup>2</sup>Google DeepMind</div>
-    <div class="buttons">
-      <a class="btn" href="#" aria-disabled="true" title="Paper link coming soon" id="paperBtn">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"/><path d="M14 3v5h5M8 13h8M8 17h6"/></svg>
-        Paper <span class="soon">(soon)</span>
-      </a>
-      <a class="btn" href="https://github.com/IemProg/DMC">
-        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.68 0-1.26.45-2.28 1.19-3.09-.12-.29-.52-1.46.11-3.05 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.78 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.59.23 2.76.11 3.05.74.81 1.19 1.83 1.19 3.09 0 4.41-2.69 5.38-5.26 5.67.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5z"/></svg>
-        Code
-      </a>
-      <a class="btn ghost" href="#bibtex">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M7 8l-4 4 4 4M17 8l4 4-4 4M14 4l-4 16"/></svg>
-        BibTeX
-      </a>
-    </div>
+  <p class="authors">
+    <span><a href="https://iemprog.github.io/">Imad Eddine Marouf</a><sup>1</sup></span>
+    <span>Khalid Oublal<sup>2</sup></span>
+    <span><a href="https://enzotarta.github.io/">Enzo Tartaglione</a><sup>1</sup></span>
+    <span><a href="https://stelat.eu/">Stéphane Lathuilière</a><sup>3</sup></span>
+  </p>
+  <p class="affil"><span><sup>1</sup>Télécom Paris, Institut Polytechnique de Paris</span> <span><sup>2</sup>Google DeepMind</span> <span><sup>3</sup>Inria, Grenoble, France</span></p>
 
-    <div class="tldr">
-      <svg viewBox="0 0 160 110" aria-hidden="true">
-        <g transform="rotate(-20 80 55)">
-          <ellipse cx="80" cy="55" rx="76" ry="34" fill="var(--corr)" opacity=".08"/>
-          <ellipse cx="80" cy="55" rx="58" ry="25" fill="var(--corr)" opacity=".11"/>
-          <ellipse cx="80" cy="55" rx="40" ry="17" fill="var(--corr)" opacity=".15"/>
-          <line x1="36" y1="55" x2="124" y2="55" stroke="var(--corr)" stroke-width="5" stroke-linecap="round"/>
-          <circle cx="36" cy="55" r="9" fill="var(--gen)"/>
-          <circle cx="124" cy="55" r="9" fill="var(--spec)"/>
-          <path d="M53.6 46.5l2.3 4.8 5.2.6-3.9 3.6 1.1 5.2-4.7-2.6-4.6 2.6 1-5.2-3.9-3.6 5.3-.6z" fill="var(--surface)" stroke="var(--corr)" stroke-width="1.6"/>
-        </g>
-      </svg>
-      <div>
-        <p class="lead">One prompt cannot serve two objectives. Give each its own.</p>
-        <p>Prompt learning asks a single prompt to both <span class="t-spec">specialize</span> to seen classes and <span class="t-gen">stay close to zero-shot CLIP</span>; at convergence those two gradients point in opposite directions. <b>DMC</b> trains one prompt per objective and joins them with a <span class="t-corr">low-loss corridor</span>, then deploys a single point on it, with no extra inference cost.</p>
-      </div>
-    </div>
-  </div>
+  <nav class="links" aria-label="Resources">
+    <span class="btn is-off" aria-disabled="true" title="The paper link will be added when it is public">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 1.5h5.5L13 5v9.5H4z M9.5 1.5V5H13" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+      Paper <em>soon</em>
+    </span>
+    <a class="btn" href="https://github.com/IemProg/DMC">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+      Code
+    </a>
+    <a class="btn" href="#citation">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 3.5h10M3 8h10M3 12.5h6" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      BibTeX
+    </a>
+  </nav>
 </header>
 
-<main id="main" class="wrap">
+<main>
 
-<!-- (a) -->
-<section class="q" id="problem" aria-labelledby="h-problem">
-  <div class="qhead"><span class="qnum">01</span><h2 id="h-problem">What goes wrong when we fine-tune CLIP's prompt?</h2></div>
-  <p class="answer">Base accuracy rises by 13 points and novel accuracy falls by 11, so <strong>the harmonic mean does not move</strong>.</p>
-  <div class="grid-6-4">
-    <div class="card">
-      <div class="kicker">Average over 11 datasets · ViT-B/16 · 16 shots · published numbers</div>
-      <table class="stat-table">
-        <thead><tr><th></th><th>Zero-shot CLIP</th><th>CoOp (learned prompt)</th></tr></thead>
-        <tbody>
-          <tr><td>Base classes <span class="note">(trained on)</span></td><td class="big">69.3</td><td class="big">82.7<span class="delta t-good">+13.4</span></td></tr>
-          <tr><td>Novel classes <span class="note">(never seen)</span></td><td class="big">74.2</td><td class="big">63.2<span class="delta t-bad">−11.0</span></td></tr>
-          <tr><td><b>Harmonic mean</b></td><td class="big">71.7</td><td class="big">71.7</td></tr>
-        </tbody>
-      </table>
+<figure class="teaser" id="teaser">
+  <svg id="heroSvg" viewBox="0 0 600 270" role="img" aria-labelledby="heroTitle heroDesc">
+    <title id="heroTitle">From one prompt to two prompts joined by a corridor</title>
+    <desc id="heroDesc">A single prompt c is pulled toward the base-class optimum by cross-entropy and toward zero-shot features by the anchor R, and stalls between them. It then splits into two prompts, c_spec and c_gen, each moving toward its own goal. A corridor joins them, and a star marks the deployed classifier at alpha equal to 0.20.</desc>
+    <defs>
+      <marker id="hdS" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" class="f-spec"/></marker>
+      <marker id="hdG" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" class="f-gen"/></marker>
+    </defs>
+    <g class="goal gen">
+      <circle cx="92" cy="190" r="36" class="ring"/><circle cx="92" cy="190" r="23" class="ring"/><circle cx="92" cy="190" r="10" class="ring"/>
+      <text x="56" y="252" text-anchor="start" class="glabel">zero-shot features</text>
+    </g>
+    <g class="goal spec">
+      <circle cx="508" cy="88" r="36" class="ring"/><circle cx="508" cy="88" r="23" class="ring"/><circle cx="508" cy="88" r="10" class="ring"/>
+      <text x="544" y="34" text-anchor="end" class="glabel">base-class optimum</text>
+    </g>
+    <g id="hCorr" opacity="0">
+      <line id="hBand" class="band"/>
+      <line id="hLine" class="corr-line"/>
+    </g>
+    <g id="hArrows">
+      <line id="hArS" class="arrow s-spec" marker-end="url(#hdS)"/>
+      <line id="hArG" class="arrow s-gen" marker-end="url(#hdG)"/>
+      <text id="hTxS" class="alabel f-spec" text-anchor="middle">cross-entropy</text>
+      <text id="hTxG" class="alabel f-gen" text-anchor="middle">anchor <tspan font-style="italic" font-family="var(--serif)">R</tspan></text>
+    </g>
+    <circle id="hGen" r="8" class="pt f-gen" opacity="0"/>
+    <circle id="hSpec" r="8" class="pt f-spec" opacity="0"/>
+    <circle id="hOne" r="8.5" class="pt f-ink"/>
+    <text id="hOneL" class="mlabel" text-anchor="middle"><tspan font-style="italic">c</tspan></text>
+    <text id="hGenL" class="mlabel f-gen" text-anchor="middle" opacity="0"><tspan font-style="italic">c</tspan><tspan class="sub" dy="5">gen</tspan></text>
+    <text id="hSpecL" class="mlabel f-spec" text-anchor="middle" opacity="0"><tspan font-style="italic">c</tspan><tspan class="sub" dy="5">spec</tspan></text>
+    <g id="hStar" opacity="0">
+      <path class="star" d="M0,-12 L3.5,-4.2 L11.4,-3.7 L5.3,1.6 L7.1,9.7 L0,5.4 L-7.1,9.7 L-5.3,1.6 L-11.4,-3.7 L-3.5,-4.2Z"/>
+      <text y="32" text-anchor="middle" class="slabel"><tspan font-style="italic">α</tspan> = 0.20</text>
+    </g>
+  </svg>
+  <figcaption class="steps">
+    <ol aria-hidden="true">
+      <li data-step="0" data-n="1">One prompt, opposing pulls</li>
+      <li data-step="1" data-n="2">One prompt per objective</li>
+      <li data-step="2" data-n="3">Corridor, deploy one point</li>
+    </ol>
+    <button type="button" id="replay" class="textbtn">Replay</button>
+  </figcaption>
+</figure>
+
+<p class="abstract">Prompt learning on CLIP trades accuracy on unseen classes for accuracy on the training classes, because a single prompt has to follow two gradients that point in nearly opposite directions. DMC gives each objective its own prompt, couples the two through a low-loss linear corridor in text-feature space, and deploys one point on that corridor, at the inference cost of a single prompt.</p>
+
+<section id="tradeoff">
+  <h2>The trade-off</h2>
+  <p>We tune CLIP's text prompt on the base half of each dataset's classes and test on both halves. Averaged over 11 datasets, CoOp gains 13.4 points on base classes and loses 11.0 on novel ones. The harmonic mean ends where zero-shot CLIP started.</p>
+
+  <figure class="chart" id="tradeChart">
+    <div class="legend"><span><i class="key k-ghost"></i>zero-shot CLIP</span><span><i class="key k-spec"></i>CoOp</span></div>
+    <div class="bars">
+      <div class="brow" data-from="69.34" data-to="82.69" data-d="+13.4"><span class="blab">Base</span><span class="track"><span class="fill"></span><span class="ghost"></span></span><span class="bval">69.3</span></div>
+      <div class="brow" data-from="74.22" data-to="63.22" data-d="−11.0"><span class="blab">Novel</span><span class="track"><span class="fill"></span><span class="ghost"></span></span><span class="bval">74.2</span></div>
+      <div class="brow" data-from="71.70" data-to="71.66" data-d="0.0"><span class="blab">HM</span><span class="track"><span class="fill"></span><span class="ghost"></span></span><span class="bval">71.7</span></div>
     </div>
-    <div class="card">
-      <h3>The setting</h3>
-      <p>CLIP stays frozen; only a few context vectors in the text prompt are learned (4 × 512 ≈ 2K parameters).</p>
-      <p>Train on <b>base</b> classes, test on base <em>and</em> <b>novel</b> classes. The harmonic mean HM = 2BN/(B+N) rewards only methods that do well on both.</p>
-      <p>The prompt drifts toward directions that separate the base classes, and CLIP's knowledge of the novel classes erodes.</p>
-    </div>
-  </div>
+    <div class="axis"><span style="left:0">0</span><span style="left:50%">50</span><span style="left:100%">100</span></div>
+    <figcaption>Average accuracy over 11 datasets (%). Tick marks show zero-shot CLIP.</figcaption>
+  </figure>
 </section>
 
-<!-- (b) -->
-<section class="q" id="losses" aria-labelledby="h-losses">
-  <div class="qhead"><span class="qnum">02</span><h2 id="h-losses">Would a better regularizer fix it?</h2></div>
-  <p class="answer"><strong>No.</strong> Across seven single-prompt variants, the best gain is +0.40 HM, about what retuning λ gives, and no variant clearly gains on both datasets.</p>
-  <p class="lede">Current methods add an anchor to CLIP's zero-shot text features (cosine anchors, self-distillation, or a low-loss path as in MergeTune, our starting point). We swapped that anchor for seven alternatives, each at the best point of its own sweep.</p>
-  <div class="card">
-    <div class="legend"><span><i class="sw" style="background:var(--zs)"></i>Caltech101</span><span><i class="sw" style="background:var(--corr)"></i>Flowers102</span><span><i class="sw" style="background:var(--good);opacity:.25"></i>gain from simply retuning λ (0.22 / 0.26)</span></div>
-    <div class="only-wide"><svg class="chart" viewBox="0 0 640 288" role="img" aria-labelledby="vt vd"><title id="vt">Seven single-prompt loss variants</title><desc id="vd">Change in HM relative to the cosine anchor on Caltech101 and Flowers102. Best gain +0.40; zero-shot distillation is +0.40 on Caltech101 but -2.37 on Flowers102.</desc><rect x="495.0" y="10" width="32.5" height="244" fill="var(--good)" opacity=".13"/><line class="grid" x1="245.0" x2="245.0" y1="10" y2="254"/><text class="muted" x="245.0" y="270" text-anchor="middle">-2</text><line class="grid" x1="370.0" x2="370.0" y1="10" y2="254"/><text class="muted" x="370.0" y="270" text-anchor="middle">-1</text><line class="grid" x1="495.0" x2="495.0" y1="10" y2="254"/><text class="muted" x="495.0" y="270" text-anchor="middle">0</text><line class="grid" x1="620.0" x2="620.0" y1="10" y2="254"/><text class="muted" x="620.0" y="270" text-anchor="middle">+1</text><text class="muted" x="395.0" y="286" text-anchor="middle">ΔHM vs. cosine anchor (MergeTune)</text><text class="lbl" x="160" y="34.0" text-anchor="end" dominant-baseline="middle">Fisher-weighted cosine</text><rect class="mark" x="495.0" y="21" width="26.2" height="11" rx="3" fill="var(--zs)" data-tip="Fisher-weighted cosine · Caltech101: +0.21 HM"><title>Fisher-weighted cosine · Caltech101: +0.21 HM</title></rect><text class="val" x="526.2" y="27.5" dominant-baseline="middle" font-size="11" text-anchor="start">+0.21</text><rect class="mark" x="495.0" y="34" width="27.5" height="11" rx="3" fill="var(--corr)" data-tip="Fisher-weighted cosine · Flowers102: +0.22 HM"><title>Fisher-weighted cosine · Flowers102: +0.22 HM</title></rect><text class="val" x="527.5" y="40.5" dominant-baseline="middle" font-size="11" text-anchor="start">+0.22</text><text class="lbl" x="160" y="68.0" text-anchor="end" dominant-baseline="middle">Prompt-space EWC</text><rect class="mark" x="495.0" y="55" width="3.8" height="11" rx="3" fill="var(--zs)" data-tip="Prompt-space EWC · Caltech101: +0.03 HM"><title>Prompt-space EWC · Caltech101: +0.03 HM</title></rect><text class="val" x="503.8" y="61.5" dominant-baseline="middle" font-size="11" text-anchor="start">+0.03</text><rect class="mark" x="495.0" y="68" width="2.5" height="11" rx="3" fill="var(--corr)" data-tip="Prompt-space EWC · Flowers102: +0.02 HM"><title>Prompt-space EWC · Flowers102: +0.02 HM</title></rect><text class="val" x="502.5" y="74.5" dominant-baseline="middle" font-size="11" text-anchor="start">+0.02</text><text class="lbl" x="160" y="102.0" text-anchor="end" dominant-baseline="middle">KL path</text><rect class="mark" x="485.0" y="89" width="10.0" height="11" rx="3" fill="var(--zs)" data-tip="KL path · Caltech101: -0.08 HM"><title>KL path · Caltech101: -0.08 HM</title></rect><text class="val" x="480.0" y="95.5" dominant-baseline="middle" font-size="11" text-anchor="end">-0.08</text><rect class="mark" x="495.0" y="102" width="1.5" height="11" rx="3" fill="var(--corr)" data-tip="KL path · Flowers102: +0.01 HM"><title>KL path · Flowers102: +0.01 HM</title></rect><text class="val" x="501.2" y="108.5" dominant-baseline="middle" font-size="11" text-anchor="start">+0.01</text><text class="lbl" x="160" y="136.0" text-anchor="end" dominant-baseline="middle">Zero-shot distillation</text><rect class="mark" x="495.0" y="123" width="50.0" height="11" rx="3" fill="var(--zs)" data-tip="Zero-shot distillation · Caltech101: +0.40 HM"><title>Zero-shot distillation · Caltech101: +0.40 HM</title></rect><text class="val" x="550.0" y="129.5" dominant-baseline="middle" font-size="11" text-anchor="start">+0.40</text><rect class="mark" x="198.8" y="136" width="296.2" height="11" rx="3" fill="var(--corr)" data-tip="Zero-shot distillation · Flowers102: -2.37 HM"><title>Zero-shot distillation · Flowers102: -2.37 HM</title></rect><text class="val" x="193.8" y="142.5" dominant-baseline="middle" font-size="11" text-anchor="end">-2.37</text><text class="lbl" x="160" y="170.0" text-anchor="end" dominant-baseline="middle">Weight scheduling</text><rect class="mark" x="415.0" y="157" width="80.0" height="11" rx="3" fill="var(--zs)" data-tip="Weight scheduling · Caltech101: -0.64 HM"><title>Weight scheduling · Caltech101: -0.64 HM</title></rect><text class="val" x="410.0" y="163.5" dominant-baseline="middle" font-size="11" text-anchor="end">-0.64</text><rect class="mark" x="312.5" y="170" width="182.5" height="11" rx="3" fill="var(--corr)" data-tip="Weight scheduling · Flowers102: -1.46 HM"><title>Weight scheduling · Flowers102: -1.46 HM</title></rect><text class="val" x="307.5" y="176.5" dominant-baseline="middle" font-size="11" text-anchor="end">-1.46</text><text class="lbl" x="160" y="204.0" text-anchor="end" dominant-baseline="middle">VA on the same prompt</text><rect class="mark" x="490.0" y="191" width="5.0" height="11" rx="3" fill="var(--zs)" data-tip="VA on the same prompt · Caltech101: -0.04 HM"><title>VA on the same prompt · Caltech101: -0.04 HM</title></rect><text class="val" x="485.0" y="197.5" dominant-baseline="middle" font-size="11" text-anchor="end">-0.04</text><rect class="mark" x="495.0" y="204" width="45.0" height="11" rx="3" fill="var(--corr)" data-tip="VA on the same prompt · Flowers102: +0.36 HM"><title>VA on the same prompt · Flowers102: +0.36 HM</title></rect><text class="val" x="545.0" y="210.5" dominant-baseline="middle" font-size="11" text-anchor="start">+0.36</text><text class="lbl" x="160" y="238.0" text-anchor="end" dominant-baseline="middle">Test-time interpolation</text><rect class="mark" x="495.0" y="225" width="15.0" height="11" rx="3" fill="var(--zs)" data-tip="Test-time interpolation · Caltech101: +0.12 HM"><title>Test-time interpolation · Caltech101: +0.12 HM</title></rect><text class="val" x="515.0" y="231.5" dominant-baseline="middle" font-size="11" text-anchor="start">+0.12</text><rect class="mark" x="405.0" y="238" width="90.0" height="11" rx="3" fill="var(--corr)" data-tip="Test-time interpolation · Flowers102: -0.72 HM"><title>Test-time interpolation · Flowers102: -0.72 HM</title></rect><text class="val" x="400.0" y="244.5" dominant-baseline="middle" font-size="11" text-anchor="end">-0.72</text><line class="axis" x1="495.0" x2="495.0" y1="10" y2="254"/></svg></div><div class="only-narrow"><svg class="chart compact" viewBox="0 0 360 442" role="img" aria-label="Seven single-prompt loss variants: change in HM on Caltech101 and Flowers102"><rect x="231.6" y="6" width="22.0" height="406" fill="var(--good)" opacity=".13"/><line class="grid" x1="62.7" x2="62.7" y1="6" y2="412"/><text class="muted" x="62.7" y="430" text-anchor="middle">-2</text><line class="grid" x1="147.1" x2="147.1" y1="6" y2="412"/><text class="muted" x="147.1" y="430" text-anchor="middle">-1</text><line class="grid" x1="231.6" x2="231.6" y1="6" y2="412"/><text class="muted" x="231.6" y="430" text-anchor="middle">0</text><line class="grid" x1="316.0" x2="316.0" y1="6" y2="412"/><text class="muted" x="316.0" y="430" text-anchor="middle">+1</text><text class="lbl" x="12" y="22">Fisher-weighted cosine</text><rect x="231.6" y="30" width="17.7" height="10" rx="3" fill="var(--zs)"/><text class="val" x="253.3" y="36.0" dominant-baseline="middle" text-anchor="start">+0.21</text><rect x="231.6" y="43" width="18.6" height="10" rx="3" fill="var(--corr)"/><text class="val" x="254.1" y="49.0" dominant-baseline="middle" text-anchor="start">+0.22</text><text class="lbl" x="12" y="80">Prompt-space EWC</text><rect x="231.6" y="88" width="2.5" height="10" rx="3" fill="var(--zs)"/><text class="val" x="238.1" y="94.0" dominant-baseline="middle" text-anchor="start">+0.03</text><rect x="231.6" y="101" width="1.7" height="10" rx="3" fill="var(--corr)"/><text class="val" x="237.2" y="107.0" dominant-baseline="middle" text-anchor="start">+0.02</text><text class="lbl" x="12" y="138">KL path</text><rect x="224.8" y="146" width="6.8" height="10" rx="3" fill="var(--zs)"/><text class="val" x="220.8" y="152.0" dominant-baseline="middle" text-anchor="end">-0.08</text><rect x="231.6" y="159" width="1.5" height="10" rx="3" fill="var(--corr)"/><text class="val" x="236.4" y="165.0" dominant-baseline="middle" text-anchor="start">+0.01</text><text class="lbl" x="12" y="196">Zero-shot distillation</text><rect x="231.6" y="204" width="33.8" height="10" rx="3" fill="var(--zs)"/><text class="val" x="269.3" y="210.0" dominant-baseline="middle" text-anchor="start">+0.40</text><rect x="31.4" y="217" width="200.1" height="10" rx="3" fill="var(--corr)"/><text class="val" x="27.4" y="223.0" dominant-baseline="middle" text-anchor="end">-2.37</text><text class="lbl" x="12" y="254">Weight scheduling</text><rect x="177.5" y="262" width="54.0" height="10" rx="3" fill="var(--zs)"/><text class="val" x="173.5" y="268.0" dominant-baseline="middle" text-anchor="end">-0.64</text><rect x="108.3" y="275" width="123.3" height="10" rx="3" fill="var(--corr)"/><text class="val" x="104.3" y="281.0" dominant-baseline="middle" text-anchor="end">-1.46</text><text class="lbl" x="12" y="312">VA on the same prompt</text><rect x="228.2" y="320" width="3.4" height="10" rx="3" fill="var(--zs)"/><text class="val" x="224.2" y="326.0" dominant-baseline="middle" text-anchor="end">-0.04</text><rect x="231.6" y="333" width="30.4" height="10" rx="3" fill="var(--corr)"/><text class="val" x="266.0" y="339.0" dominant-baseline="middle" text-anchor="start">+0.36</text><text class="lbl" x="12" y="370">Test-time interpolation</text><rect x="231.6" y="378" width="10.1" height="10" rx="3" fill="var(--zs)"/><text class="val" x="245.7" y="384.0" dominant-baseline="middle" text-anchor="start">+0.12</text><rect x="170.8" y="391" width="60.8" height="10" rx="3" fill="var(--corr)"/><text class="val" x="166.8" y="397.0" dominant-baseline="middle" text-anchor="end">-0.72</text><line class="axis" x1="231.6" x2="231.6" y1="6" y2="412"/></svg></div>
-    <p class="note">Seed 1. What helps one dataset often hurts the other: zero-shot distillation is +0.40 on Caltech101 and −2.37 on Flowers102. Changing the loss is not the lever.</p>
-  </div>
-</section>
+<section id="ceiling">
+  <h2>Why a better loss does not fix it</h2>
+  <p>Methods such as KgCoOp and MergeTune add a regularizer <span class="m-gen">\(\mathcal{R}\)</span> that pulls the prompt back toward CLIP's zero-shot text features. When one prompt \(\mathbf{c}\) carries both terms, every stationary point of \(\mathcal{L}_{\mathrm{CE}} + \lambda\mathcal{R}\) satisfies</p>
+  <div class="eq">\[ \htmlClass{m-spec}{\nabla_{\mathbf{c}}\,\mathcal{L}_{\mathrm{CE}}} \;=\; -\lambda\,\htmlClass{m-gen}{\nabla_{\mathbf{c}}\,\mathcal{R}}. \]</div>
+  <p>No step from there improves both objectives, and changing \(\lambda\) slides the solution along the trade-off rather than past it. The opposition shows up in practice: at the converged single-prompt model, the cosine \(\gamma\) between the two gradients is negative on every dataset and baseline we measured.</p>
 
-<!-- (c) -->
-<section class="q" id="diagnosis" aria-labelledby="h-diagnosis">
-  <div class="qhead"><span class="qnum">03</span><h2 id="h-diagnosis">Then where does the ceiling come from?</h2></div>
-  <p class="answer">From the <strong>parameterization</strong>: one shared prompt receives two opposing gradients.</p>
-  <div class="grid2">
-    <div class="card">
-      <svg class="tug" viewBox="0 0 460 170" role="img" aria-labelledby="tt">
-        <title id="tt">One shared prompt pulled in opposite directions by the cross-entropy and regularizer gradients</title>
-        <defs>
-          <marker id="ah-s" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--spec)"/></marker>
-          <marker id="ah-g" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="var(--gen)"/></marker>
-        </defs>
-        <line x1="258" y1="70" x2="395" y2="70" stroke="var(--spec)" stroke-width="7" marker-end="url(#ah-s)"/>
-        <line x1="202" y1="70" x2="65" y2="70" stroke="var(--gen)" stroke-width="7" marker-end="url(#ah-g)"/>
-        <circle cx="230" cy="70" r="26" fill="var(--ink)"/>
-        <text x="230" y="76" text-anchor="middle" fill="var(--bg)" style="font:700 18px var(--font)">c</text>
-        <text x="330" y="52" text-anchor="middle" fill="var(--spec)" style="font:600 14px var(--font)">−∇L_CE</text>
-        <text x="130" y="52" text-anchor="middle" fill="var(--gen)" style="font:600 14px var(--font)">−λ∇R</text>
-        <text x="410" y="100" text-anchor="end" fill="var(--ink-2)" style="font:13px var(--font)">specialize to base</text>
-        <text x="50" y="100" fill="var(--ink-2)" style="font:13px var(--font)">stay near zero-shot</text>
-        <text x="230" y="138" text-anchor="middle" fill="var(--muted)" style="font:13px var(--font)">at a stationary point the forces cancel:</text>
-        <text x="230" y="158" text-anchor="middle" fill="var(--ink)" style="font:600 14px var(--font)">∇L_CE = −λ ∇R</text>
-      </svg>
-      <p>Every step that lowers one objective raises the other: the solution is <b>Pareto-stationary</b>. Changing λ slides it <em>along</em> the trade-off, never beyond it.</p>
-    </div>
-    <div class="card">
-      <div class="kicker">Measured at the converged single-prompt (MergeTune) model</div>
-      <div class="legend"><span><i class="sw" style="background:var(--spec)"></i>CoOp</span><span><i class="sw" style="background:color-mix(in srgb, var(--spec) 45%, var(--surface))"></i>KgCoOp</span></div>
-      <div><svg class="chart" viewBox="0 0 460 188" role="img" aria-labelledby="gt gd"><title id="gt">Measured gradient conflict</title><desc id="gd">Cosine between the cross-entropy and regularizer gradients at the converged single-prompt model. Negative on all 8 dataset-baseline pairs; -0.955 on Flowers with CoOp.</desc><line class="grid" x1="70.0" x2="70.0" y1="8" y2="152"/><text class="muted" x="70.0" y="168" text-anchor="middle">-1</text><line class="grid" x1="240.0" x2="240.0" y1="8" y2="152"/><text class="muted" x="240.0" y="168" text-anchor="middle">-0.5</text><line class="grid" x1="410.0" x2="410.0" y1="8" y2="152"/><text class="muted" x="410.0" y="168" text-anchor="middle">0</text><text class="muted" x="240.0" y="186" text-anchor="middle">γ = cos(∇L_CE, ∇R)</text><text class="lbl" x="62" y="26.0" text-anchor="end" dominant-baseline="middle">Flowers</text><rect class="mark" x="85.3" y="13" width="324.7" height="12" rx="3" fill="var(--spec)" data-tip="Flowers · CoOp: γ = -0.955"><title>Flowers · CoOp: γ = -0.955</title></rect><text class="val" font-size="11" x="415.0" y="20.0" dominant-baseline="middle">-0.95</text><rect class="mark" x="96.2" y="27" width="313.8" height="12" rx="3" fill="color-mix(in srgb, var(--spec) 45%, var(--surface))" data-tip="Flowers · KgCoOp: γ = -0.923"><title>Flowers · KgCoOp: γ = -0.923</title></rect><text class="val" font-size="11" x="415.0" y="34.0" dominant-baseline="middle">-0.92</text><text class="lbl" x="62" y="62.0" text-anchor="end" dominant-baseline="middle">Food</text><rect class="mark" x="146.2" y="49" width="263.8" height="12" rx="3" fill="var(--spec)" data-tip="Food · CoOp: γ = -0.776"><title>Food · CoOp: γ = -0.776</title></rect><text class="val" font-size="11" x="415.0" y="56.0" dominant-baseline="middle">-0.78</text><rect class="mark" x="230.5" y="63" width="179.5" height="12" rx="3" fill="color-mix(in srgb, var(--spec) 45%, var(--surface))" data-tip="Food · KgCoOp: γ = -0.528"><title>Food · KgCoOp: γ = -0.528</title></rect><text class="val" font-size="11" x="415.0" y="70.0" dominant-baseline="middle">-0.53</text><text class="lbl" x="62" y="98.0" text-anchor="end" dominant-baseline="middle">Caltech</text><rect class="mark" x="166.6" y="85" width="243.4" height="12" rx="3" fill="var(--spec)" data-tip="Caltech · CoOp: γ = -0.716"><title>Caltech · CoOp: γ = -0.716</title></rect><text class="val" font-size="11" x="415.0" y="92.0" dominant-baseline="middle">-0.72</text><rect class="mark" x="311.7" y="99" width="98.3" height="12" rx="3" fill="color-mix(in srgb, var(--spec) 45%, var(--surface))" data-tip="Caltech · KgCoOp: γ = -0.289"><title>Caltech · KgCoOp: γ = -0.289</title></rect><text class="val" font-size="11" x="415.0" y="106.0" dominant-baseline="middle">-0.29</text><text class="lbl" x="62" y="134.0" text-anchor="end" dominant-baseline="middle">Pets</text><rect class="mark" x="338.3" y="121" width="71.7" height="12" rx="3" fill="var(--spec)" data-tip="Pets · CoOp: γ = -0.211"><title>Pets · CoOp: γ = -0.211</title></rect><text class="val" font-size="11" x="415.0" y="128.0" dominant-baseline="middle">-0.21</text><rect class="mark" x="212.8" y="135" width="197.2" height="12" rx="3" fill="color-mix(in srgb, var(--spec) 45%, var(--surface))" data-tip="Pets · KgCoOp: γ = -0.580"><title>Pets · KgCoOp: γ = -0.580</title></rect><text class="val" font-size="11" x="415.0" y="142.0" dominant-baseline="middle">-0.58</text><line class="axis" x1="410.0" x2="410.0" y1="8" y2="152"/></svg></div>
-      <p class="note">γ &lt; 0 on all 8 dataset–baseline pairs; ≈ −0.95 on Flowers. The conflict is in gradient <em>directions</em>, not class semantics.</p>
-    </div>
-  </div>
-</section>
-
-<!-- (d) -->
-<section class="q" id="idea" aria-labelledby="h-idea">
-  <div class="qhead"><span class="qnum">04</span><h2 id="h-idea">What if each objective had its own prompt?</h2></div>
-  <p class="answer">Give <span class="t-spec">specialization</span> and <span class="t-gen">generalization</span> one prompt each and join them with an <span class="t-corr">LMC corridor</span> in text-feature space. <strong>Train the whole segment, deploy one point.</strong></p>
-
-  <div class="card widget" id="widget">
-    <div class="widget-stage">
-      <svg id="corridorSvg" viewBox="0 0 800 280" role="img" aria-labelledby="wt wd">
-        <title id="wt">The DMC corridor</title>
-        <desc id="wd">A segment in text-feature space from the generalization features f_gen (alpha = 0) to the specialization features f_spec (alpha = 1). A marker shows the classifier at the chosen alpha; a star marks the deployed alpha = 0.20. Schematic.</desc>
-        <defs>
-          <linearGradient id="corrGrad" x1="0" x2="1">
-            <stop offset="0" stop-color="var(--gen)"/><stop offset=".5" stop-color="var(--corr)"/><stop offset="1" stop-color="var(--spec)"/>
-          </linearGradient>
-        </defs>
-        <g transform="rotate(-14 400 150)" aria-hidden="true">
-          <ellipse cx="400" cy="150" rx="370" ry="118" fill="var(--corr)" opacity=".06"/>
-          <ellipse cx="400" cy="150" rx="300" ry="88" fill="var(--corr)" opacity=".08"/>
-          <ellipse cx="400" cy="150" rx="225" ry="60" fill="var(--corr)" opacity=".10"/>
-          <ellipse cx="400" cy="150" rx="150" ry="34" fill="var(--corr)" opacity=".12"/>
-        </g>
-        <text x="786" y="270" text-anchor="end" fill="var(--muted)" style="font:12px var(--font)">shaded: low-loss valley (schematic)</text>
-        <!-- zero-shot -->
-        <circle cx="96" cy="262" r="7" fill="var(--zs)"/>
-        <text x="110" y="266" fill="var(--muted)" style="font:12.5px var(--font)">f_zs · zero-shot CLIP</text>
-        <line x1="100" y1="253" x2="140" y2="222" stroke="var(--zs)" stroke-dasharray="3 4"/>
-        <!-- corridor -->
-        <line id="seg" x1="150" y1="208" x2="650" y2="84" stroke="url(#corrGrad)" stroke-width="9" stroke-linecap="round"/>
-        <g id="ticks"></g>
-        <circle cx="150" cy="208" r="15" fill="var(--gen)"/>
-        <circle cx="650" cy="84" r="15" fill="var(--spec)"/>
-        <text x="150" y="176" text-anchor="middle" fill="var(--gen)" style="font:700 15px var(--font)">f_gen</text>
-        <text x="150" y="245" text-anchor="middle" fill="var(--muted)" style="font:12px var(--font)">α = 0</text>
-        <text x="650" y="54" text-anchor="middle" fill="var(--spec)" style="font:700 15px var(--font)">f_spec</text>
-        <text x="650" y="120" text-anchor="middle" fill="var(--muted)" style="font:12px var(--font)">α = 1</text>
-        <!-- deployed star at alpha=0.20 -->
-        <g id="starMark"></g>
-        <!-- moving point -->
-        <g id="pt">
-          <circle r="13" fill="var(--surface)" stroke="var(--corr)" stroke-width="4"/>
-          <circle r="4" fill="var(--corr)"/>
-        </g>
-        <text id="ptLabel" text-anchor="middle" fill="var(--ink)" style="font:700 13px var(--mono)"></text>
-      </svg>
-    </div>
-    <div class="widget-controls">
-      <div class="slider-row">
-        <label for="alpha">α = <span id="alphaVal">0.20</span></label>
-        <input type="range" id="alpha" min="0" max="1" step="0.01" value="0.20" aria-describedby="explainTitle">
-        <button class="chip" type="button" data-a="0">α = 0</button>
-        <button class="chip star" type="button" data-a="0.2">★ deployed 0.20</button>
-        <button class="chip" type="button" data-a="1">α = 1</button>
-      </div>
-      <div class="readout">
-        <div>
-          <div class="formula" id="formula">f̃(α) = ℓ2( 0.80·f_gen + 0.20·f_spec )</div>
-          <div class="mixbar" aria-hidden="true"><div class="g" id="mixG" style="width:80%"></div><div class="s" id="mixS" style="width:20%"></div></div>
-          <div class="mixlbl"><span id="mixGl" class="t-gen">80% generalization</span><span id="mixSl" class="t-spec">20% specialization</span></div>
-        </div>
-        <div class="explain" aria-live="polite">
-          <h3 id="explainTitle">The deployed classifier</h3>
-          <p id="explainText"></p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="grid3" style="margin-top:16px">
-    <div class="card"><h3>Why feature space?</h3><p>Logits are linear in the text features, so every point of the segment <em>is</em> a classifier. The text encoder is non-linear: mixing the prompts themselves would not trace this segment.</p></div>
-    <div class="card"><h3>Training</h3><p>A fresh α ~ U[0,1] at every step keeps the loss low along the <em>whole</em> segment, not only at its ends.</p></div>
-    <div class="card"><h3>Inference</h3><p>Merge once at α = 0.20 (chosen on 2 dev datasets, fixed for all). One text-feature matrix: DMC adds ~2K parameters and <b>no inference overhead</b>.</p></div>
-  </div>
-</section>
-
-<!-- (e) -->
-<section class="q" id="training" aria-labelledby="h-training">
-  <div class="qhead"><span class="qnum">05</span><h2 id="h-training">How is DMC trained?</h2></div>
-  <p class="answer">Both prompts start from the same fine-tuned checkpoint. Each sees only its own objective; the <span class="t-corr">corridor</span> is the only term that couples them.</p>
-  <div class="card">
-    <div class="loss">\[
-      \mathcal{L}_{\mathrm{DMC}} =
-      \underbrace{\htmlClass{c-spec}{\mathcal{L}_{\mathrm{CE}}(f_{\mathrm{spec}}) + \lambda_{\mathrm{VA}}\,\mathcal{L}_{\mathrm{VA}}}}_{\htmlClass{c-spec}{\mathbf{c}_{\mathrm{spec}}\ \text{only}}}
-      \;+\;
-      \underbrace{\htmlClass{c-gen}{\lambda_{\mathrm{gen}}\,\mathcal{R}(f_{\mathrm{gen}}, f_{\mathrm{zs}})}}_{\htmlClass{c-gen}{\mathbf{c}_{\mathrm{gen}}\ \text{only}}}
-      \;+\;
-      \underbrace{\htmlClass{c-corr}{\beta\,\mathbb{E}_{\alpha\sim U[0,1]}\,\mathcal{L}_{\mathrm{CE}}\big(\tilde f(\alpha)\big)}}_{\htmlClass{c-corr}{\text{couples both}}}
-    \]</div>
-    <div class="terms">
-      <div class="term spec"><div class="kicker t-spec">Specialize</div><p>Cross-entropy on base classes, free of any pull toward zero-shot features, plus a light <b>Visual Anchor</b>.</p></div>
-      <div class="term gen"><div class="kicker t-gen">Generalize</div><p>Only the cosine anchor R = 1 − (1/C) Σ<sub>c</sub> cos(f<sub>c</sub>, f<sub>zs,c</sub>). Learnable, so it keeps useful task structure.</p></div>
-      <div class="term corr"><div class="kicker t-corr">Corridor</div><p>f̃(α) = ℓ2(f<sub>gen</sub> + α(f<sub>spec</sub> − f<sub>gen</sub>)): every classifier on the segment must have low loss.</p></div>
-    </div>
-    <p class="note" style="margin-top:12px">λ<sub>gen</sub> = 8, β = 4, λ<sub>VA</sub> = 0.5, τ = 2, fixed across all experiments; other settings follow MergeTune.</p>
-  </div>
-  <div class="grid2" style="margin-top:16px">
-    <div class="card">
-      <h3>Visual Anchor: keep CLIP's class similarities</h3>
-      <p>Cross-entropy alone erases the small similarities CLIP encodes between related classes (a rose looks a bit like a peony). VA matches CLIP's class-similarity distribution on each training image, across two augmented views, without using the label. With one view it is <em>exactly</em> a KL divergence to CLIP's pretrained distribution. In our ablations it is a small refinement.</p>
-    </div>
-    <div class="card">
-      <h3>Which regularizers can transfer to unseen classes?</h3>
-      <p><b>Class-permutation invariance (CPI)</b>: a regularizer that cannot tell <em>which</em> class is which. A class-aware one writes base-class identity into the prompt; under idealized assumptions, Fano's inequality turns that into a lower bound on the novel-accuracy drop.</p>
-      <p>CPI is <b>necessary, not sufficient</b>. Both DMC regularizers satisfy it; Fisher-weighted cosine and prompt-space EWC do not.</p>
-    </div>
-  </div>
-</section>
-
-<!-- (f) -->
-<section class="q" id="evidence" aria-labelledby="h-evidence">
-  <div class="qhead"><span class="qnum">06</span><h2 id="h-evidence">Does it actually work?</h2></div>
-  <p class="answer">On both prompt-tuning bases, yes: average HM <strong>76.45 → 77.23</strong> (CoOp) and <strong>76.43 → 76.76</strong> (KgCoOp) over single-prompt MergeTune, 3-seed means.</p>
-
-  <h3 style="margin:28px 0 10px">Where does the corridor end up?</h3>
-  <figure class="card">
-    <div class="fig fig-scroll"><img src="assets/fig1_overview_main.png" width="2414" height="970" loading="lazy" decoding="async" alt="Joint base-plus-novel cross-entropy landscape on Flowers102 in a 2D slice of text-feature space, shown before, during and after DMC training."></div>
-    <div class="steps">
-      <div><b>Before</b>The single-prompt path from zero-shot CLIP to the fine-tuned prompt crosses high-loss regions.</div>
-      <div><b>During</b>Both prompts start at the same checkpoint and <em>separate</em> as training proceeds.</div>
-      <div><b>After</b>The corridor lies in a low-loss valley that the zero-shot ↔ fine-tuned path never enters. ★ = α = 0.20.</div>
-    </div>
-    <figcaption>Joint base + novel cross-entropy, Flowers102; 2D slice of text-feature space.</figcaption>
+  <figure class="chart" id="gammaChart">
+    <div class="legend"><span><i class="key k-ink"></i>CoOp</span><span><i class="key k-ink2"></i>KgCoOp</span></div>
+    <div class="gbars" id="gbars"></div>
+    <div class="axis gaxis"><span style="left:0">−1</span><span style="left:50%">−0.5</span><span style="left:100%">0</span></div>
+    <figcaption>\(\gamma = \cos(\nabla_{\mathbf{c}}\mathcal{L}_{\mathrm{CE}},\,\nabla_{\mathbf{c}}\mathcal{R})\) at the converged MergeTune prompt, over the full training set.</figcaption>
   </figure>
 
-  <h3 style="margin:32px 0 10px">Does DMC move the frontier, or slide along it?</h3>
-  <figure class="card">
-    <div class="fig fig-scroll"><img src="assets/fig2_pareto_main.png" width="2213" height="561" loading="lazy" decoding="async" alt="Base versus novel accuracy curves along the corridor on Caltech101, SUN397, UCF101 and EuroSAT; the DMC operating point sits up and to the right of MergeTune."></div>
-    <figcaption>Each curve sweeps α from c<sub>gen</sub> (0) to c<sub>spec</sub> (1); gray dot = single-prompt MergeTune, star = DMC at α = 0.20 (3-seed mean). On these datasets the star sits <b>up and to the right</b>: base and novel improve together. This is not the case on every dataset; see the table below.</figcaption>
+  <p>Swapping the regularizer does not help either. Seven alternatives on the same single prompt, among them Fisher weighting, prompt-space EWC and zero-shot distillation, gained at most 0.40 HM on Caltech101 and Flowers102, about what retuning \(\lambda\) gives.</p>
+</section>
+
+<section id="method">
+  <h2>Two prompts and a corridor</h2>
+  <p>DMC starts two prompts from the same fine-tuned checkpoint. The specialization prompt <span class="m-spec">\(\mathbf{c}_{\mathrm{spec}}\)</span> is trained by cross-entropy, the generalization prompt <span class="m-gen">\(\mathbf{c}_{\mathrm{gen}}\)</span> by the anchor. The only term that couples them is a corridor: every normalized mixture of their text features must classify base images well.</p>
+  <div class="eq">\[ \htmlClass{m-corr}{\widetilde f(\alpha)} = \ell_2\big(\htmlClass{m-gen}{f_{\mathrm{gen}}} + \alpha\,(\htmlClass{m-spec}{f_{\mathrm{spec}}} - \htmlClass{m-gen}{f_{\mathrm{gen}}})\big) \]</div>
+  <div class="eq eq-loss">\[ \mathcal{L}_{\mathrm{DMC}} = \underbrace{\htmlClass{m-spec}{\mathcal{L}_{\mathrm{CE}}(f_{\mathrm{spec}}) + \lambda_{\mathrm{VA}}\mathcal{L}_{\mathrm{VA}}}}_{\htmlClass{m-spec}{\mathbf{c}_{\mathrm{spec}}\text{ only}}} + \underbrace{\htmlClass{m-gen}{\lambda_{\mathrm{gen}}\,\mathcal{R}(f_{\mathrm{gen}}, f_{w_1})}}_{\htmlClass{m-gen}{\mathbf{c}_{\mathrm{gen}}\text{ only}}} + \underbrace{\htmlClass{m-corr}{\beta\,\mathbb{E}_{\alpha\sim\mathcal{U}[0,1]}\,\mathcal{L}_{\mathrm{CE}}\big(\widetilde f(\alpha)\big)}}_{\htmlClass{m-corr}{\text{corridor, both}}} \]</div>
+  <div class="eq eq-narrow">\[ \begin{aligned} \mathcal{L}_{\mathrm{DMC}} = {} & \htmlClass{m-spec}{\mathcal{L}_{\mathrm{CE}}(f_{\mathrm{spec}}) + \lambda_{\mathrm{VA}}\mathcal{L}_{\mathrm{VA}}} \\ {}+{} & \htmlClass{m-gen}{\lambda_{\mathrm{gen}}\,\mathcal{R}(f_{\mathrm{gen}}, f_{w_1})} \\ {}+{} & \htmlClass{m-corr}{\beta\,\mathbb{E}_{\alpha}\,\mathcal{L}_{\mathrm{CE}}\big(\widetilde f(\alpha)\big)} \end{aligned} \]</div>
+  <p>The corridor is drawn in text-feature space because logits are linear in the text features, so every point of the segment is itself a classifier. A segment between prompts would not have this property. After training we fix <span class="nw">\(\alpha = 0.20\)</span> for all datasets and merge the features once.</p>
+
+  <figure class="widget" id="widget">
+    <svg id="wSvg" viewBox="0 0 600 190" role="img" aria-labelledby="wTitle">
+      <title id="wTitle">The corridor from f_gen to f_spec; the ring marks the classifier selected by alpha and the star marks alpha = 0.20.</title>
+      <line x1="80" y1="132" x2="520" y2="62" class="band"/>
+      <line x1="80" y1="132" x2="520" y2="62" class="corr-line"/>
+      <g id="wTicks"></g>
+      <circle cx="80" cy="132" r="9" class="pt f-gen"/>
+      <circle cx="520" cy="62" r="9" class="pt f-spec"/>
+      <text x="80" y="170" text-anchor="middle" class="mlabel f-gen"><tspan font-style="italic">f</tspan><tspan class="sub" dy="5">gen</tspan></text>
+      <text x="520" y="38" text-anchor="middle" class="mlabel f-spec"><tspan font-style="italic">f</tspan><tspan class="sub" dy="5">spec</tspan></text>
+      <g id="wStar"><path class="star is-ghost" d="M0,-12 L3.5,-4.2 L11.4,-3.7 L5.3,1.6 L7.1,9.7 L0,5.4 L-7.1,9.7 L-5.3,1.6 L-11.4,-3.7 L-3.5,-4.2Z"/></g>
+      <g id="wPt"><circle r="12" class="cursor"/><circle r="4" class="f-corr"/></g>
+    </svg>
+    <div class="wctl">
+      <label for="alpha" class="m-corr"><i>α</i></label>
+      <input type="range" id="alpha" min="0" max="1" step="0.01" value="0.20">
+      <output id="alphaOut" for="alpha">0.20</output>
+    </div>
+    <div class="wread">
+      <p class="wmix" aria-hidden="true"><i class="m-corr">f̃</i> = ℓ<sub>2</sub>(<span id="wg" class="m-gen">0.80</span> <i class="m-gen">f</i><sub class="m-gen">gen</sub> + <span id="ws" class="m-spec">0.20</span> <i class="m-spec">f</i><sub class="m-spec">spec</sub>)</p>
+      <p id="wText" class="wtext" aria-live="polite"></p>
+    </div>
   </figure>
 
-  <h3 style="margin:32px 0 6px">Does it hold across 11 datasets?</h3>
-  <p class="lede" style="margin-bottom:10px">ΔHM of DMC over single-prompt MergeTune, same pipeline, 3-seed mean, α = 0.20. Hover a cell for absolute numbers.</p>
-  <div class="card">
-    <div class="heat-wrap"><table class="heat"><caption class="sr-only" style="position:absolute;left:-9999px">Change in harmonic mean, DMC minus MergeTune, per dataset</caption><thead><tr><th></th><th scope="col" title="ImageNet">IN</th><th scope="col" title="Caltech101">Cal</th><th scope="col" title="OxfordPets">Pets</th><th scope="col" title="StanfordCars">Cars</th><th scope="col" title="Flowers102">Flo</th><th scope="col" title="Food101">Food</th><th scope="col" title="FGVCAircraft">Air</th><th scope="col" title="SUN397">SUN</th><th scope="col" title="DTD">DTD</th><th scope="col" title="EuroSAT">Euro</th><th scope="col" title="UCF101">UCF</th><th scope="col" class="avgh">Avg</th></tr></thead><tbody><tr><th scope="row" class="row">CoOp</th><td style="background:color-mix(in srgb, var(--good) 8%, var(--surface))" data-tip="ImageNet: MergeTune 72.89 → DMC 72.90 HM (+0.01)" tabindex="0" aria-label="ImageNet: MergeTune 72.89 → DMC 72.90 HM (+0.01)">+0.01</td><td style="background:color-mix(in srgb, var(--good) 8%, var(--surface))" data-tip="Caltech101: MergeTune 96.27 → DMC 96.41 HM (+0.14)" tabindex="0" aria-label="Caltech101: MergeTune 96.27 → DMC 96.41 HM (+0.14)">+0.14</td><td style="background:color-mix(in srgb, var(--bad) 8%, var(--surface))" data-tip="OxfordPets: MergeTune 96.13 → DMC 96.04 HM (-0.09)" tabindex="0" aria-label="OxfordPets: MergeTune 96.13 → DMC 96.04 HM (-0.09)">-0.09</td><td style="background:color-mix(in srgb, var(--good) 37%, var(--surface))" data-tip="StanfordCars: MergeTune 73.38 → DMC 75.21 HM (+1.83)" tabindex="0" aria-label="StanfordCars: MergeTune 73.38 → DMC 75.21 HM (+1.83)">+1.83</td><td style="background:color-mix(in srgb, var(--good) 11%, var(--surface))" data-tip="Flowers102: MergeTune 83.92 → DMC 84.47 HM (+0.55)" tabindex="0" aria-label="Flowers102: MergeTune 83.92 → DMC 84.47 HM (+0.55)">+0.55</td><td style="background:color-mix(in srgb, var(--good) 8%, var(--surface))" data-tip="Food101: MergeTune 91.05 → DMC 91.13 HM (+0.08)" tabindex="0" aria-label="Food101: MergeTune 91.05 → DMC 91.13 HM (+0.08)">+0.08</td><td style="background:color-mix(in srgb, var(--good) 38%, var(--surface))" data-tip="FGVCAircraft: MergeTune 33.33 → DMC 35.23 HM (+1.90)" tabindex="0" aria-label="FGVCAircraft: MergeTune 33.33 → DMC 35.23 HM (+1.90)">+1.90</td><td style="background:color-mix(in srgb, var(--good) 18%, var(--surface))" data-tip="SUN397: MergeTune 77.85 → DMC 78.75 HM (+0.90)" tabindex="0" aria-label="SUN397: MergeTune 77.85 → DMC 78.75 HM (+0.90)">+0.90</td><td style="background:color-mix(in srgb, var(--bad) 15%, var(--surface))" data-tip="DTD: MergeTune 64.26 → DMC 63.53 HM (-0.73)" tabindex="0" aria-label="DTD: MergeTune 64.26 → DMC 63.53 HM (-0.73)">-0.73</td><td style="background:color-mix(in srgb, var(--good) 46%, var(--surface))" data-tip="EuroSAT: MergeTune 73.45 → DMC 75.75 HM (+2.30)" tabindex="0" aria-label="EuroSAT: MergeTune 73.45 → DMC 75.75 HM (+2.30)">+2.30</td><td style="background:color-mix(in srgb, var(--good) 33%, var(--surface))" data-tip="UCF101: MergeTune 78.42 → DMC 80.07 HM (+1.65)" tabindex="0" aria-label="UCF101: MergeTune 78.42 → DMC 80.07 HM (+1.65)">+1.65</td><td class="avg" style="background:color-mix(in srgb, var(--good) 16%, var(--surface))" data-tip="Average: MergeTune 76.45 → DMC 77.23 HM (+0.78)" tabindex="0" aria-label="Average: MergeTune 76.45 → DMC 77.23 HM (+0.78)">+0.78</td></tr><tr><th scope="row" class="row">KgCoOp</th><td style="background:color-mix(in srgb, var(--good) 8%, var(--surface))" data-tip="ImageNet: MergeTune 72.82 → DMC 73.09 HM (+0.27)" tabindex="0" aria-label="ImageNet: MergeTune 72.82 → DMC 73.09 HM (+0.27)">+0.27</td><td style="background:color-mix(in srgb, var(--good) 8%, var(--surface))" data-tip="Caltech101: MergeTune 95.94 → DMC 96.11 HM (+0.17)" tabindex="0" aria-label="Caltech101: MergeTune 95.94 → DMC 96.11 HM (+0.17)">+0.17</td><td style="background:color-mix(in srgb, var(--bad) 8%, var(--surface))" data-tip="OxfordPets: MergeTune 96.28 → DMC 96.23 HM (-0.05)" tabindex="0" aria-label="OxfordPets: MergeTune 96.28 → DMC 96.23 HM (-0.05)">-0.05</td><td style="background:color-mix(in srgb, var(--good) 10%, var(--surface))" data-tip="StanfordCars: MergeTune 74.90 → DMC 75.38 HM (+0.48)" tabindex="0" aria-label="StanfordCars: MergeTune 74.90 → DMC 75.38 HM (+0.48)">+0.48</td><td style="background:color-mix(in srgb, var(--good) 8%, var(--surface))" data-tip="Flowers102: MergeTune 83.39 → DMC 83.67 HM (+0.28)" tabindex="0" aria-label="Flowers102: MergeTune 83.39 → DMC 83.67 HM (+0.28)">+0.28</td><td style="background:color-mix(in srgb, var(--good) 8%, var(--surface))" data-tip="Food101: MergeTune 91.08 → DMC 91.19 HM (+0.11)" tabindex="0" aria-label="Food101: MergeTune 91.08 → DMC 91.19 HM (+0.11)">+0.11</td><td style="background:color-mix(in srgb, var(--bad) 19%, var(--surface))" data-tip="FGVCAircraft: MergeTune 34.10 → DMC 33.17 HM (-0.93)" tabindex="0" aria-label="FGVCAircraft: MergeTune 34.10 → DMC 33.17 HM (-0.93)">-0.93</td><td style="background:color-mix(in srgb, var(--good) 16%, var(--surface))" data-tip="SUN397: MergeTune 78.03 → DMC 78.85 HM (+0.82)" tabindex="0" aria-label="SUN397: MergeTune 78.03 → DMC 78.85 HM (+0.82)">+0.82</td><td style="background:color-mix(in srgb, var(--good) 34%, var(--surface))" data-tip="DTD: MergeTune 62.66 → DMC 64.34 HM (+1.68)" tabindex="0" aria-label="DTD: MergeTune 62.66 → DMC 64.34 HM (+1.68)">+1.68</td><td style="background:color-mix(in srgb, var(--bad) 8%, var(--surface))" data-tip="EuroSAT: MergeTune 73.44 → DMC 73.38 HM (-0.06)" tabindex="0" aria-label="EuroSAT: MergeTune 73.44 → DMC 73.38 HM (-0.06)">-0.06</td><td style="background:color-mix(in srgb, var(--good) 16%, var(--surface))" data-tip="UCF101: MergeTune 78.08 → DMC 78.90 HM (+0.82)" tabindex="0" aria-label="UCF101: MergeTune 78.08 → DMC 78.90 HM (+0.82)">+0.82</td><td class="avg" style="background:color-mix(in srgb, var(--good) 8%, var(--surface))" data-tip="Average: MergeTune 76.43 → DMC 76.76 HM (+0.33)" tabindex="0" aria-label="Average: MergeTune 76.43 → DMC 76.76 HM (+0.33)">+0.33</td></tr></tbody></table></div>
-    <div class="heat-legend">
-      <span>worse</span><span class="ramp" style="background:linear-gradient(90deg,color-mix(in srgb,var(--bad) 46%,var(--surface)),var(--neutral-bg),color-mix(in srgb,var(--good) 46%,var(--surface)))"></span><span>better</span>
-      <span>·</span><span>Caltech101 and Flowers102 also served as development sets for α.</span>
-    </div>
-    <div class="grid3" style="margin-top:16px">
-      <div class="callout"><b>Consistency.</b> Up on 8/10 (CoOp) and 7/10 (KgCoOp) non-ImageNet datasets; drops ≤ 0.93, within seed spread.</div>
-      <div class="callout"><b>Largest gains.</b> CoOp: EuroSAT +2.30, Aircraft +1.90, Cars +1.83, UCF +1.65.</div>
-      <div class="callout"><b>Training-free merging hurts.</b> TIES and DARE <em>lower</em> HM for every base method.</div>
-    </div>
-    <details>
-      <summary>Full HM table (11 datasets)</summary>
-      <div class="tbl-wrap"><table class="full"><thead><tr><th>Method</th><th>Avg</th><th>IN</th><th>Cal</th><th>Pets</th><th>Cars</th><th>Flo</th><th>Food</th><th>Air</th><th>SUN</th><th>DTD</th><th>Euro</th><th>UCF</th></tr></thead><tbody><tr><td>CLIP</td><td class="avgc">71.70</td><td>70.22</td><td>95.40</td><td>94.12</td><td>68.65</td><td>74.83</td><td>90.66</td><td>31.09</td><td>72.23</td><td>56.37</td><td>60.03</td><td>73.85</td></tr><tr><td>CoOp</td><td class="avgc">71.66</td><td>71.92</td><td>93.73</td><td>94.47</td><td>68.13</td><td>74.06</td><td>85.19</td><td>28.75</td><td>72.51</td><td>54.24</td><td>68.69</td><td>67.46</td></tr><tr><td>KgCoOp</td><td class="avgc">77.01</td><td>72.78</td><td>96.03</td><td>96.18</td><td>73.36</td><td>83.65</td><td>91.10</td><td>34.83</td><td>78.36</td><td>64.35</td><td>73.48</td><td>79.66</td></tr><tr><td>MaPLe</td><td class="avgc">78.55</td><td>73.47</td><td>96.02</td><td>96.58</td><td>73.47</td><td>82.56</td><td>91.38</td><td>36.50</td><td>79.75</td><td>68.16</td><td>82.35</td><td>80.77</td></tr><tr><td>PromptSRC</td><td class="avgc">79.97</td><td>74.01</td><td>96.02</td><td>96.30</td><td>76.58</td><td>85.95</td><td>91.10</td><td>40.15</td><td>80.52</td><td>71.75</td><td>82.32</td><td>82.74</td></tr><tr><td>MMA</td><td class="avgc">79.87</td><td>74.02</td><td>96.15</td><td>96.72</td><td>75.70</td><td>85.48</td><td>90.71</td><td>38.33</td><td>80.38</td><td>73.38</td><td>83.87</td><td>82.20</td></tr><tr class="sep"><td>CoOp + TIES</td><td class="avgc">66.32</td><td>65.60</td><td>92.50</td><td>92.56</td><td>60.56</td><td>69.27</td><td>88.02</td><td>29.54</td><td>62.70</td><td>48.40</td><td>58.40</td><td>58.30</td></tr><tr><td>CoOp + DARE</td><td class="avgc">70.59</td><td>68.93</td><td>93.67</td><td>94.84</td><td>64.57</td><td>74.92</td><td>87.50</td><td>31.03</td><td>66.47</td><td>57.04</td><td>67.39</td><td>66.28</td></tr><tr><td>CoOp + MergeTune</td><td class="avgc">76.45</td><td>72.89</td><td>96.27</td><td>96.13</td><td>73.38</td><td>83.92</td><td>91.05</td><td>33.33</td><td>77.85</td><td>64.26</td><td>73.45</td><td>78.42</td></tr><tr class="ours"><td>CoOp + DMC (ours)</td><td class="avgc">77.23</td><td>72.90</td><td>96.41</td><td>96.04</td><td>75.21</td><td>84.47</td><td>91.13</td><td>35.23</td><td>78.75</td><td>63.53</td><td>75.75</td><td>80.07</td></tr><tr class="sep"><td>KgCoOp + TIES</td><td class="avgc">72.56</td><td>70.93</td><td>95.83</td><td>95.23</td><td>69.73</td><td>73.39</td><td>90.91</td><td>29.86</td><td>73.46</td><td>56.93</td><td>67.02</td><td>74.18</td></tr><tr><td>KgCoOp + DARE</td><td class="avgc">75.17</td><td>71.78</td><td>95.97</td><td>94.73</td><td>70.33</td><td>79.33</td><td>91.02</td><td>31.85</td><td>76.12</td><td>62.01</td><td>72.19</td><td>78.71</td></tr><tr><td>KgCoOp + MergeTune</td><td class="avgc">76.43</td><td>72.82</td><td>95.94</td><td>96.28</td><td>74.90</td><td>83.39</td><td>91.08</td><td>34.10</td><td>78.03</td><td>62.66</td><td>73.44</td><td>78.08</td></tr><tr class="ours"><td>KgCoOp + DMC (ours)</td><td class="avgc">76.76</td><td>73.09</td><td>96.11</td><td>96.23</td><td>75.38</td><td>83.67</td><td>91.19</td><td>33.17</td><td>78.85</td><td>64.34</td><td>73.38</td><td>78.90</td></tr><tr class="sep"><td>MMA + TIES</td><td class="avgc">69.41</td><td>69.66</td><td>93.77</td><td>92.17</td><td>65.08</td><td>72.07</td><td>89.31</td><td>28.65</td><td>67.56</td><td>51.63</td><td>66.80</td><td>65.60</td></tr><tr><td>MMA + DARE</td><td class="avgc">71.81</td><td>70.27</td><td>93.70</td><td>92.96</td><td>68.01</td><td>73.92</td><td>88.72</td><td>29.25</td><td>72.02</td><td>57.74</td><td>70.17</td><td>70.78</td></tr><tr><td>MMA + MergeTune</td><td class="avgc">72.58</td><td>73.15</td><td>95.75</td><td>93.22</td><td>70.16</td><td>75.22</td><td>90.18</td><td>32.72</td><td>76.70</td><td>58.07</td><td>59.57</td><td>73.59</td></tr><tr class="ours"><td>MMA + DMC (ours)</td><td class="avgc">73.16</td><td>72.90</td><td>95.74</td><td>93.38</td><td>70.51</td><td>76.37</td><td>90.33</td><td>33.10</td><td>77.12</td><td>59.62</td><td>60.57</td><td>75.11</td></tr></tbody></table></div>
-      <p class="note">CLIP, CoOp, KgCoOp, MaPLe, PromptSRC and MMA rows are published single-run numbers. MergeTune and DMC rows are our 3-seed means at α = 0.20.</p>
-    </details>
-  </div>
-
-  <div class="grid2" style="margin-top:32px">
+  <div class="aside">
     <div>
-      <h3 style="margin:0 0 6px">Is the gain just extra parameters?</h3>
-      <p class="answer" style="margin-top:6px">No. A single prompt with <strong>twice</strong> DMC's parameters still trails it on all four datasets.</p>
-      <div class="card">
-        <div class="legend">
-          <span><i class="sw round" style="background:color-mix(in srgb, var(--zs) 40%, var(--surface))"></i>1 prompt, 2K</span>
-          <span><i class="sw round" style="background:color-mix(in srgb, var(--zs) 70%, var(--surface))"></i>4K</span>
-          <span><i class="sw round" style="background:var(--zs)"></i>8K</span>
-          <span><i class="sw round" style="background:var(--corr)"></i>DMC, 2 × 2K</span>
-        </div>
-        <div><svg class="chart" viewBox="0 0 460 228" role="img" aria-labelledby="prt prd"><title id="prt">Longer single prompts versus DMC</title><desc id="prd">HM, 3-seed mean. CoOp with 2K, 4K and 8K context parameters versus DMC with two 2K prompts. DMC is highest on all four datasets.</desc><line class="grid" x1="139.5" x2="139.5" y1="18" y2="194"/><text class="muted" x="139.5" y="210" text-anchor="middle">70</text><line class="grid" x1="193.9" x2="193.9" y1="18" y2="194"/><text class="muted" x="193.9" y="210" text-anchor="middle">75</text><line class="grid" x1="248.2" x2="248.2" y1="18" y2="194"/><text class="muted" x="248.2" y="210" text-anchor="middle">80</text><line class="grid" x1="302.6" x2="302.6" y1="18" y2="194"/><text class="muted" x="302.6" y="210" text-anchor="middle">85</text><line class="grid" x1="357.0" x2="357.0" y1="18" y2="194"/><text class="muted" x="357.0" y="210" text-anchor="middle">90</text><line class="grid" x1="411.4" x2="411.4" y1="18" y2="194"/><text class="muted" x="411.4" y="210" text-anchor="middle">95</text><text class="muted" x="270.0" y="226" text-anchor="middle">HM (%), 3-seed mean</text><text class="lbl" x="86" y="40.0" text-anchor="end" dominant-baseline="middle">Flowers102</text><line x1="224.8" x2="296.9" y1="40.0" y2="40.0" stroke="var(--rule)" stroke-width="3"/><circle class="mark" cx="253.8" cy="40.0" r="6.5" fill="color-mix(in srgb, var(--zs) 40%, var(--surface))" stroke="var(--surface)" stroke-width="2" data-tip="Flowers102 · 1 prompt · 2K: 80.51 HM"><title>Flowers102 · 1 prompt · 2K: 80.51 HM</title></circle><circle class="mark" cx="224.8" cy="40.0" r="6.5" fill="color-mix(in srgb, var(--zs) 70%, var(--surface))" stroke="var(--surface)" stroke-width="2" data-tip="Flowers102 · 1 prompt · 4K: 77.84 HM"><title>Flowers102 · 1 prompt · 4K: 77.84 HM</title></circle><circle class="mark" cx="241.7" cy="40.0" r="6.5" fill="var(--zs)" stroke="var(--surface)" stroke-width="2" data-tip="Flowers102 · 1 prompt · 8K: 79.40 HM"><title>Flowers102 · 1 prompt · 8K: 79.40 HM</title></circle><circle class="mark" cx="296.9" cy="40.0" r="8" fill="var(--corr)" stroke="var(--surface)" stroke-width="2" data-tip="Flowers102 · DMC · 2×2K: 84.47 HM"><title>Flowers102 · DMC · 2×2K: 84.47 HM</title></circle><text class="val" font-size="11" x="296.9" y="27.0" text-anchor="middle">84.47</text><text class="lbl" x="86" y="84.0" text-anchor="end" dominant-baseline="middle">Caltech101</text><line x1="380.8" x2="426.7" y1="84.0" y2="84.0" stroke="var(--rule)" stroke-width="3"/><circle class="mark" cx="405.1" cy="84.0" r="6.5" fill="color-mix(in srgb, var(--zs) 40%, var(--surface))" stroke="var(--surface)" stroke-width="2" data-tip="Caltech101 · 1 prompt · 2K: 94.42 HM"><title>Caltech101 · 1 prompt · 2K: 94.42 HM</title></circle><circle class="mark" cx="380.8" cy="84.0" r="6.5" fill="color-mix(in srgb, var(--zs) 70%, var(--surface))" stroke="var(--surface)" stroke-width="2" data-tip="Caltech101 · 1 prompt · 4K: 92.19 HM"><title>Caltech101 · 1 prompt · 4K: 92.19 HM</title></circle><circle class="mark" cx="415.1" cy="84.0" r="6.5" fill="var(--zs)" stroke="var(--surface)" stroke-width="2" data-tip="Caltech101 · 1 prompt · 8K: 95.34 HM"><title>Caltech101 · 1 prompt · 8K: 95.34 HM</title></circle><circle class="mark" cx="426.7" cy="84.0" r="8" fill="var(--corr)" stroke="var(--surface)" stroke-width="2" data-tip="Caltech101 · DMC · 2×2K: 96.41 HM"><title>Caltech101 · DMC · 2×2K: 96.41 HM</title></circle><text class="val" font-size="11" x="426.7" y="71.0" text-anchor="middle">96.41</text><text class="lbl" x="86" y="128.0" text-anchor="end" dominant-baseline="middle">StanfordCars</text><line x1="121.6" x2="196.2" y1="128.0" y2="128.0" stroke="var(--rule)" stroke-width="3"/><circle class="mark" cx="161.0" cy="128.0" r="6.5" fill="color-mix(in srgb, var(--zs) 40%, var(--surface))" stroke="var(--surface)" stroke-width="2" data-tip="StanfordCars · 1 prompt · 2K: 71.98 HM"><title>StanfordCars · 1 prompt · 2K: 71.98 HM</title></circle><circle class="mark" cx="121.6" cy="128.0" r="6.5" fill="color-mix(in srgb, var(--zs) 70%, var(--surface))" stroke="var(--surface)" stroke-width="2" data-tip="StanfordCars · 1 prompt · 4K: 68.35 HM"><title>StanfordCars · 1 prompt · 4K: 68.35 HM</title></circle><circle class="mark" cx="141.8" cy="128.0" r="6.5" fill="var(--zs)" stroke="var(--surface)" stroke-width="2" data-tip="StanfordCars · 1 prompt · 8K: 70.21 HM"><title>StanfordCars · 1 prompt · 8K: 70.21 HM</title></circle><circle class="mark" cx="196.2" cy="128.0" r="8" fill="var(--corr)" stroke="var(--surface)" stroke-width="2" data-tip="StanfordCars · DMC · 2×2K: 75.21 HM"><title>StanfordCars · DMC · 2×2K: 75.21 HM</title></circle><text class="val" font-size="11" x="196.2" y="115.0" text-anchor="middle">75.21</text><text class="lbl" x="86" y="172.0" text-anchor="end" dominant-baseline="middle">EuroSAT</text><line x1="139.0" x2="202.0" y1="172.0" y2="172.0" stroke="var(--rule)" stroke-width="3"/><circle class="mark" cx="152.3" cy="172.0" r="6.5" fill="color-mix(in srgb, var(--zs) 40%, var(--surface))" stroke="var(--surface)" stroke-width="2" data-tip="EuroSAT · 1 prompt · 2K: 71.18 HM"><title>EuroSAT · 1 prompt · 2K: 71.18 HM</title></circle><circle class="mark" cx="139.0" cy="172.0" r="6.5" fill="color-mix(in srgb, var(--zs) 70%, var(--surface))" stroke="var(--surface)" stroke-width="2" data-tip="EuroSAT · 1 prompt · 4K: 69.95 HM"><title>EuroSAT · 1 prompt · 4K: 69.95 HM</title></circle><circle class="mark" cx="164.4" cy="172.0" r="6.5" fill="var(--zs)" stroke="var(--surface)" stroke-width="2" data-tip="EuroSAT · 1 prompt · 8K: 72.29 HM"><title>EuroSAT · 1 prompt · 8K: 72.29 HM</title></circle><circle class="mark" cx="202.0" cy="172.0" r="8" fill="var(--corr)" stroke="var(--surface)" stroke-width="2" data-tip="EuroSAT · DMC · 2×2K: 75.75 HM"><title>EuroSAT · DMC · 2×2K: 75.75 HM</title></circle><text class="val" font-size="11" x="202.0" y="159.0" text-anchor="middle">75.75</text></svg></div>
-        <p class="note">CoOp with n<sub>ctx</sub> ∈ {4, 8, 16}, 3 seeds each. Longer contexts do not reliably help; the 8K prompt is also much noisier across seeds (σ = 9.5 on EuroSAT).</p>
-      </div>
+      <h3>Visual Anchor</h3>
+      <p>Freed from the anchor, cross-entropy tends to push base classes apart and erase the smaller similarities CLIP keeps between related classes. The Visual Anchor matches CLIP's zero-shot class-similarity distribution on each training image with a KL term that never reads the label. It is a refinement: in our ablation it helps on two of four datasets.</p>
     </div>
     <div>
-      <h3 style="margin:0 0 6px">Is it just having two prompts?</h3>
-      <p class="answer" style="margin-top:6px">No. Without the anchor the two prompts <strong>collapse</strong> into one and DMC falls below MergeTune.</p>
-      <div class="card">
-        <div><svg class="chart" viewBox="0 0 460 216" role="img" aria-labelledby="at ad"><title id="at">Component ablation on Flowers102</title><desc id="ad">HM, 3 seeds, matched beta. DMC 84.33, DMC without VA 83.91, MergeTune 82.86, DMC without the anchor R 78.66 (endpoints collapse), MergeTune without R 78.19, CoOp 80.51. Axis starts at 76.</desc><line class="grid" x1="130.0" x2="130.0" y1="6" y2="186"/><text class="muted" x="130.0" y="202" text-anchor="middle">76</text><line class="grid" x1="190.9" x2="190.9" y1="6" y2="186"/><text class="muted" x="190.9" y="202" text-anchor="middle">78</text><line class="grid" x1="251.8" x2="251.8" y1="6" y2="186"/><text class="muted" x="251.8" y="202" text-anchor="middle">80</text><line class="grid" x1="312.7" x2="312.7" y1="6" y2="186"/><text class="muted" x="312.7" y="202" text-anchor="middle">82</text><line class="grid" x1="373.6" x2="373.6" y1="6" y2="186"/><text class="muted" x="373.6" y="202" text-anchor="middle">84</text><text class="lbl" x="122" y="21.0" text-anchor="end" dominant-baseline="middle">CoOp</text><rect class="mark" x="130.0" y="13.0" width="137.3" height="16" rx="3" fill="color-mix(in srgb, var(--zs) 60%, var(--surface))" data-tip="CoOp: 80.51 HM"><title>CoOp: 80.51 HM</title></rect><text class="val" font-size="11.5" x="272.3" y="22.0" dominant-baseline="middle">80.51</text><text class="lbl" x="122" y="51.0" text-anchor="end" dominant-baseline="middle">MergeTune w/o R</text><rect class="mark" x="130.0" y="43.0" width="66.7" height="16" rx="3" fill="color-mix(in srgb, var(--zs) 60%, var(--surface))" data-tip="MergeTune w/o R: 78.19 HM"><title>MergeTune w/o R: 78.19 HM</title></rect><text class="val" font-size="11.5" x="201.7" y="52.0" dominant-baseline="middle">78.19</text><text class="lbl" x="122" y="81.0" text-anchor="end" dominant-baseline="middle">MergeTune</text><rect class="mark" x="130.0" y="73.0" width="208.8" height="16" rx="3" fill="color-mix(in srgb, var(--zs) 60%, var(--surface))" data-tip="MergeTune: 82.86 HM"><title>MergeTune: 82.86 HM</title></rect><text class="val" font-size="11.5" x="343.8" y="82.0" dominant-baseline="middle">82.86</text><text class="lbl" x="122" y="111.0" text-anchor="end" dominant-baseline="middle">DMC w/o R</text><rect class="mark" x="130.0" y="103.0" width="81.0" height="16" rx="3" fill="var(--bad)" data-tip="DMC w/o R: 78.66 HM (endpoints collapse, cos 0.99)"><title>DMC w/o R: 78.66 HM (endpoints collapse, cos 0.99)</title></rect><text class="val" font-size="11.5" x="216.0" y="112.0" dominant-baseline="middle">78.66</text><text class="lbl" x="122" y="141.0" text-anchor="end" dominant-baseline="middle">DMC w/o VA</text><rect class="mark" x="130.0" y="133.0" width="240.8" height="16" rx="3" fill="color-mix(in srgb, var(--corr) 55%, var(--surface))" data-tip="DMC w/o VA: 83.91 HM"><title>DMC w/o VA: 83.91 HM</title></rect><text class="val" font-size="11.5" x="375.8" y="142.0" dominant-baseline="middle">83.91</text><text class="lbl" x="122" y="171.0" text-anchor="end" dominant-baseline="middle" font-weight="700">DMC</text><rect class="mark" x="130.0" y="163.0" width="253.6" height="16" rx="3" fill="var(--corr)" data-tip="DMC: 84.33 HM"><title>DMC: 84.33 HM</title></rect><text class="val" font-size="11.5" x="388.6" y="172.0" dominant-baseline="middle">84.33</text></svg></div>
-        <p class="note">Flowers102, HM, 3 seeds, matched β; axis starts at 76. DMC w/o R: cos(f<sub>gen</sub>, f<sub>spec</sub>) = 0.99. VA is a small refinement (+0.42 here, mixed on other datasets). Replacing the learned c<sub>gen</sub> with frozen zero-shot features costs up to 7.4 HM (EuroSAT).</p>
-      </div>
+      <h3>Class-permutation invariance</h3>
+      <p>A regularizer that depends on which class is which leaks base-class identity into the prompt. Under idealized assumptions, Fano's inequality turns that leak into a lower bound on the drop in novel accuracy. We rely on the bound for the direction of the effect, not its size. Both regularizers in DMC are invariant.</p>
     </div>
   </div>
 </section>
 
-<!-- (g) -->
-<section class="q" id="scope" aria-labelledby="h-scope">
-  <div class="qhead"><span class="qnum">07</span><h2 id="h-scope">When does DMC <em>not</em> help?</h2></div>
-  <p class="answer">When the two endpoints collapse. If f<sub>gen</sub> ≈ f<sub>spec</sub>, every point on the corridor is the same classifier: <strong>the corridor is a point</strong>.</p>
-  <div class="grid-6-4">
-    <div class="card">
-      <div class="kicker">Endpoint separation after training · average over 10 datasets, 3 seeds</div>
-      <div><svg class="chart" viewBox="0 0 460 182" role="img" aria-labelledby="st sd"><title id="st">Endpoint separation after training</title><desc id="sd">Cosine similarity between f_gen and f_spec, average over 10 datasets and 3 seeds: CoOp 0.600, KgCoOp 0.719, MMA 0.993 (collapsed).</desc><line class="grid" x1="80.0" x2="80.0" y1="10" y2="148"/><text class="muted" x="80.0" y="164" text-anchor="middle">0</text><line class="grid" x1="160.0" x2="160.0" y1="10" y2="148"/><text class="muted" x="160.0" y="164" text-anchor="middle">0.25</text><line class="grid" x1="240.0" x2="240.0" y1="10" y2="148"/><text class="muted" x="240.0" y="164" text-anchor="middle">0.5</text><line class="grid" x1="320.0" x2="320.0" y1="10" y2="148"/><text class="muted" x="320.0" y="164" text-anchor="middle">0.75</text><line class="grid" x1="400.0" x2="400.0" y1="10" y2="148"/><text class="muted" x="400.0" y="164" text-anchor="middle">1</text><text class="muted" x="240.0" y="180" text-anchor="middle">cos(f_gen, f_spec) at convergence</text><text class="lbl" x="70" y="33.0" text-anchor="end" dominant-baseline="middle">CoOp</text><rect class="mark" x="80.0" y="22.0" width="192.0" height="22" rx="4" fill="var(--corr)" data-tip="CoOp + DMC: cos = 0.600 — endpoints separated"><title>CoOp + DMC: cos = 0.600 — endpoints separated</title></rect><text class="val" x="278.0" y="34.0" dominant-baseline="middle">0.600</text><text class="lbl" x="70" y="79.0" text-anchor="end" dominant-baseline="middle">KgCoOp</text><rect class="mark" x="80.0" y="68.0" width="230.1" height="22" rx="4" fill="var(--corr)" data-tip="KgCoOp + DMC: cos = 0.719 — endpoints separated"><title>KgCoOp + DMC: cos = 0.719 — endpoints separated</title></rect><text class="val" x="316.1" y="80.0" dominant-baseline="middle">0.719</text><text class="lbl" x="70" y="125.0" text-anchor="end" dominant-baseline="middle">MMA</text><rect class="mark" x="80.0" y="114.0" width="317.8" height="22" rx="4" fill="var(--bad)" data-tip="MMA + DMC: cos = 0.993 — endpoints collapsed"><title>MMA + DMC: cos = 0.993 — endpoints collapsed</title></rect><text class="val" x="403.8" y="126.0" dominant-baseline="middle">0.993</text><line x1="396.8" x2="396.8" y1="10" y2="148" stroke="var(--bad)" stroke-dasharray="4 3"/></svg></div>
-      <details>
-        <summary>Per-dataset values</summary>
-        <div class="tbl-wrap"><table class="full" style="min-width:420px"><thead><tr><th>Dataset</th><th>CoOp + DMC</th><th>KgCoOp + DMC</th><th>MMA + DMC</th></tr></thead><tbody><tr><td>Caltech101</td><td>0.608</td><td>0.919</td><td>1.000</td></tr><tr><td>OxfordPets</td><td>0.785</td><td>0.971</td><td>1.000</td></tr><tr><td>StanfordCars</td><td>0.673</td><td>0.701</td><td>0.999</td></tr><tr><td>Flowers102</td><td>0.542</td><td>0.606</td><td>0.997</td></tr><tr><td>Food101</td><td>0.741</td><td>0.987</td><td>0.999</td></tr><tr><td>FGVCAircraft</td><td>0.514</td><td>0.521</td><td>1.000</td></tr><tr><td>SUN397</td><td>0.720</td><td>0.888</td><td>0.940</td></tr><tr><td>DTD</td><td>0.377</td><td>0.348</td><td>1.000</td></tr><tr><td>EuroSAT</td><td>0.490</td><td>0.684</td><td>1.000</td></tr><tr><td>UCF101</td><td>0.550</td><td>0.561</td><td>1.000</td></tr><tr class="sep"><td><b>Average</b></td><td><b>0.600</b></td><td><b>0.719</b></td><td><b>0.993</b></td></tr></tbody></table></div>
-      </details>
-    </div>
-    <div class="card">
-      <h3>MMA is a scope limitation</h3>
-      <p>With MMA's small adapter, the endpoints coincide (cos 0.993; SUN397 is the only dataset below 0.99). MMA + DMC still edges out MMA + MergeTune (73.16 vs 72.58 HM), but both trail the published MMA.</p>
-      <p><b>Mechanism, not correlation:</b></p>
-      <ul class="tight">
-        <li>Rerunning the component ablation on MMA reverses every gain seen on CoOp.</li>
-        <li>Text-encoder LoRA (rank 8, 16) keeps the endpoints apart on Flowers.</li>
-      </ul>
-      <p style="margin-top:10px">Separation is <b>necessary, not sufficient</b>: checking cos(f<sub>gen</sub>, f<sub>spec</sub>) at convergence flags base methods where DMC cannot help.</p>
-    </div>
-  </div>
-  <figure class="card" style="margin-top:16px">
-    <div class="fig fig-scroll"><img src="assets/fig5_dynamics.png" width="1826" height="453" loading="lazy" decoding="async" alt="Cosine similarities during CoOp + DMC training on four datasets: f_gen quickly moves close to zero-shot CLIP while f_spec moves away, so the endpoints separate."></div>
-    <figcaption>CoOp + DMC training dynamics: <span class="t-gen">f<sub>gen</sub></span> snaps back toward zero-shot CLIP within ~10 epochs, while <span class="t-spec">f<sub>spec</sub></span> drifts away, so the endpoints separate.</figcaption>
+<section id="results">
+  <h2>Results</h2>
+  <p>Across 11 datasets, DMC raises the average HM of MergeTune, the single-prompt method it builds on, from 76.45 to 77.23 with CoOp and from 76.43 to 76.76 with KgCoOp.</p>
+
+  <figure class="fig wide">
+    <div class="paper"><img src="assets/fig1_overview_main.png" width="1750" height="694" loading="lazy" decoding="async" alt="Three loss-landscape panels on Flowers102. Left: the straight path from zero-shot CLIP to the single-prompt baseline crosses a high-loss region. Middle: at epochs 0, 5, 50 and 100 the two DMC endpoints start together and move apart. Right: the trained corridor lies in a low-loss valley, with the operating point marked by a star; an inset shows base, novel and harmonic-mean accuracy along alpha."></div>
+    <figcaption>Joint base and novel cross-entropy on Flowers102, in a 2-D slice of text-feature space. The path from zero-shot CLIP to the single-prompt baseline crosses high loss. The two DMC prompts start together, move apart, and end with a corridor in a valley that path never enters.</figcaption>
   </figure>
-  <div class="callout" style="margin-top:16px"><b>Other limitations.</b> One fixed α = 0.20 for every dataset: the HM-optimal α cannot be observed from base data alone. Gains are small on near-ceiling datasets.</div>
+
+  <figure class="fig wide">
+    <div class="paper"><img src="assets/fig2_pareto_main.png" width="1607" height="392" loading="lazy" decoding="async" alt="Base versus novel accuracy on Caltech101, SUN397, UCF101 and EuroSAT. Each DMC curve sweeps alpha from the generalization to the specialization endpoint; the operating point at alpha 0.20 lies above and to the right of the MergeTune point."></div>
+    <figcaption>Each curve sweeps \(\alpha\) from \(\mathbf{c}_{\mathrm{gen}}\) to \(\mathbf{c}_{\mathrm{spec}}\). On these four datasets the star (<span class="nw">\(\alpha = 0.20\)</span>) sits up and to the right of MergeTune (gray): base and novel accuracy rise together.</figcaption>
+  </figure>
+
+  <figure class="chart wide" id="heat">
+    <div id="heatWide" class="heat-wide"></div>
+    <div id="heatTall" class="heat-tall"></div>
+    <figcaption>HM of DMC minus HM of MergeTune. DMC is ahead on 8 of the 10 non-ImageNet datasets with CoOp and 7 of 10 with KgCoOp; the drops are within seed spread. MergeTune and DMC results on this page are means over three seeds at <span class="nw">\(\alpha = 0.20\)</span>.</figcaption>
+  </figure>
+
+  <h3 class="sub-h">Is it the extra prompt?</h3>
+  <p>DMC trains two prompts of 2K parameters each. A single CoOp prompt with 8K parameters still trails it on all four datasets we tested, by 1.1 to 5.1 HM. Two prompts trained without the anchor score below MergeTune, because both collapse onto the same base-specialized solution.</p>
+
+  <figure class="chart" id="paramChart">
+    <div class="legend"><span><i class="dot d1"></i>1 prompt, 2K</span><span><i class="dot d2"></i>4K</span><span><i class="dot d3"></i>8K</span><span><i class="dot d4"></i>DMC, 2 × 2K</span></div>
+    <div class="dots" id="dots"></div>
+    <div class="axis daxis"></div>
+    <figcaption>HM with CoOp as the base method.</figcaption>
+  </figure>
 </section>
 
-<!-- (h) -->
-<section class="q" id="bibtex" aria-labelledby="h-bib">
-  <div class="qhead"><span class="qnum">08</span><h2 id="h-bib">How to cite</h2></div>
-  <div class="bib" style="margin-top:16px">
-    <pre id="bibText">@inproceedings{marouf2026dmc,
+<section id="limits">
+  <h2>Where it does not help</h2>
+  <p>DMC needs its two endpoints to stay apart after training. On the prompt-tuning baselines they do. On MMA, whose adapter is small, both endpoints collapse onto the same classifier and the corridor shrinks to a point. MMA with DMC still improves on MMA with MergeTune, but both trail the published MMA result. Separation is necessary, not sufficient.</p>
+
+  <figure class="chart" id="cosChart">
+    <div class="cbars">
+      <div class="crow" data-v="0.600"><span class="blab">CoOp</span><span class="track"><span class="fill"></span></span><span class="bval">0.600</span></div>
+      <div class="crow" data-v="0.719"><span class="blab">KgCoOp</span><span class="track"><span class="fill"></span></span><span class="bval">0.719</span></div>
+      <div class="crow is-off" data-v="0.993"><span class="blab">MMA</span><span class="track"><span class="fill"></span></span><span class="bval">0.993</span></div>
+    </div>
+    <div class="axis"><span style="left:0">0</span><span style="left:50%">0.5</span><span style="left:100%">1</span></div>
+    <figcaption>\(\cos(f_{\mathrm{gen}}, f_{\mathrm{spec}})\) after training, averaged over 10 datasets. Near 1, the two endpoints are the same classifier.</figcaption>
+  </figure>
+
+  <p>The operating point is also chosen offline. The best \(\alpha\) differs across datasets and cannot be read from base classes alone, which leaves a small gap to the best point on each corridor.</p>
+</section>
+
+<section id="citation">
+  <h2>Citation</h2>
+  <div class="bib">
+    <button type="button" id="copyBib" class="textbtn copy">Copy</button>
+<pre id="bibtex">@inproceedings{marouf2026dmc,
   title     = {Decoupled Mode Connectivity for Base-to-Novel
                Generalization in Vision-Language Models},
   author    = {Marouf, Imad Eddine and Oublal, Khalid and
-               Tartaglione, Enzo and Lathuili{\`e}re, St{\&#x27;e}phane},
+               Tartaglione, Enzo and Lathuili{\`e}re, St{\'e}phane},
   booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
   year      = {2026}
 }</pre>
-    <button class="chip copy" type="button" id="copyBib">Copy</button>
   </div>
 </section>
 
 </main>
 
 <footer>
-  <div class="wrap">
-    Code: <a href="https://github.com/IemProg/DMC">github.com/IemProg/DMC</a> · Built on CoOp, KgCoOp, MMA and MergeTune.
-  </div>
+  <p>Decoupled Mode Connectivity · NeurIPS 2026 · <a href="https://github.com/IemProg/DMC">Code on GitHub</a></p>
 </footer>
-<div class="tip" id="tip" role="tooltip"></div>
+
+<div id="tip" class="tip" role="tooltip" hidden></div>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" crossorigin="anonymous"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" crossorigin="anonymous"></script>
+<script defer src="assets/main.js"></script>
 </body>
 </html>
