@@ -8,11 +8,11 @@
 [![Paper](https://img.shields.io/badge/Paper-coming%20soon-lightgrey)](#citation)
 [![Python](https://img.shields.io/badge/python-3.8-blue)](#installation)
 
-[Imad Eddine Marouf](https://iemprog.github.io/), Khalid Oublal,
-[Enzo Tartaglione](https://enzotarta.github.io/),
-[Stéphane Lathuilière](https://stelat.eu/)
+[Imad Eddine Marouf](https://iemprog.github.io/)<sup>1</sup>, Khalid Oublal<sup>2</sup>,
+[Enzo Tartaglione](https://enzotarta.github.io/)<sup>1</sup>,
+[Stéphane Lathuilière](https://stelat.eu/)<sup>1</sup>
 
-Télécom Paris, Institut Polytechnique de Paris, France
+<sup>1</sup>Télécom Paris, Institut Polytechnique de Paris, France &nbsp; <sup>2</sup>Google DeepMind
 
 **Project page:** https://iemprog.github.io/DMC/
 
