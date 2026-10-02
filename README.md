@@ -20,6 +20,11 @@
 
 ## TL;DR
 
+<p align="center">
+  <img src="assets/dmc_animation.gif" width="880" alt="DMC in four steps: a single prompt is pulled between cross-entropy and the zero-shot anchor and can only slide along one base-novel trade-off curve; DMC gives each objective its own prompt, joins them with a low-loss corridor, and reaches points beyond that curve.">
+</p>
+<p align="center"><em>One prompt can only slide along a single base–novel trade-off curve. DMC gives each objective its own prompt and joins them with a low-loss corridor, whose classifiers reach beyond that curve (schematic).</em></p>
+
 - **The problem.** Fine-tuning CLIP's prompt on base classes raises base accuracy
   (69.3 → 82.7 for CoOp, 11-dataset average) but lowers novel accuracy
   (74.2 → 63.2): the harmonic mean does not move.
