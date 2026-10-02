@@ -18,7 +18,7 @@
 
 ---
 
-## Intuition in 30 seconds
+## TL;DR
 
 - **The problem.** Fine-tuning CLIP's prompt on base classes raises base accuracy
   (69.3 → 82.7 for CoOp, 11-dataset average) but lowers novel accuracy
@@ -26,7 +26,7 @@
 - **Why better losses don't fix it.** Existing fixes add a regularizer that pulls
   the prompt back toward zero-shot CLIP. With one shared prompt, the
   cross-entropy gradient and the regularizer gradient are antiparallel at
-  convergence (measured `γ = cos(∇L_CE, ∇R) < 0` on all 8 dataset-baseline pairs,
+  convergence (measured `ρ = cos(∇L_CE, ∇R) < 0` on all 8 dataset-baseline pairs,
   ≈ −0.95 on Flowers). Seven alternative single-prompt losses gain at most
   +0.40 HM, about what retuning `λ` gives.
 - **The idea.** Give each objective its own prompt: `c_spec` specializes,
@@ -115,31 +115,14 @@ single-prompt method.
 
 ## Results
 
-Base-to-novel generalization, harmonic mean (HM) over 11 datasets. MergeTune and
-DMC rows are **3-seed means** at `α = 0.20`; the other rows are the published
-single-run numbers.
-
-| Method | Avg | IN | Cal | Pets | Cars | Flo | Food | Air | SUN | DTD | Euro | UCF |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| CLIP | 71.70 | 70.22 | 95.40 | 94.12 | 68.65 | 74.83 | 90.66 | 31.09 | 72.23 | 56.37 | 60.03 | 73.85 |
-| CoOp | 71.66 | 71.92 | 93.73 | 94.47 | 68.13 | 74.06 | 85.19 | 28.75 | 72.51 | 54.24 | 68.69 | 67.46 |
-| KgCoOp | 77.01 | 72.78 | 96.03 | 96.18 | 73.36 | 83.65 | 91.10 | 34.83 | 78.36 | 64.35 | 73.48 | 79.66 |
-| MMA | 79.87 | 74.02 | 96.15 | 96.72 | 75.70 | 85.48 | 90.71 | 38.33 | 80.38 | 73.38 | 83.87 | 82.20 |
-| | | | | | | | | | | | | |
-| CoOp + MergeTune | 76.45 | 72.89 | 96.27 | 96.13 | 73.38 | 83.92 | 91.05 | 33.33 | 77.85 | 64.26 | 73.45 | 78.42 |
-| **CoOp + DMC** | **77.23** | 72.90 | 96.41 | 96.04 | 75.21 | 84.47 | 91.13 | 35.23 | 78.75 | 63.53 | 75.75 | 80.07 |
-| KgCoOp + MergeTune | 76.43 | 72.82 | 95.94 | 96.28 | 74.90 | 83.39 | 91.08 | 34.10 | 78.03 | 62.66 | 73.44 | 78.08 |
-| **KgCoOp + DMC** | **76.76** | 73.09 | 96.11 | 96.23 | 75.38 | 83.67 | 91.19 | 33.17 | 78.85 | 64.34 | 73.38 | 78.90 |
-| MMA + MergeTune | 72.58 | 73.15 | 95.75 | 93.22 | 70.16 | 75.22 | 90.18 | 32.72 | 76.70 | 58.07 | 59.57 | 73.59 |
-| MMA + DMC | 73.16 | 72.90 | 95.74 | 93.38 | 70.51 | 76.37 | 90.33 | 33.10 | 77.12 | 59.62 | 60.57 | 75.11 |
-
 Over the single-prompt MergeTune stage, DMC raises average HM by **+0.78**
 (CoOp) and **+0.33** (KgCoOp), improving on 8/10 and 7/10 non-ImageNet datasets
 respectively; the few drops (at most 0.93 HM) are within seed spread. On MMA
 the two endpoints collapse (`cos(f_gen, f_spec) = 0.993`), so the corridor
 degenerates: MMA + DMC edges out MMA + MergeTune but both trail the published
-MMA. Training-free merging (TIES, DARE) lowers HM for every base method; see the
-paper for those rows.
+MMA. Training-free merging (TIES, DARE) lowers HM for every base method. The
+full per-dataset tables are in the paper and on the
+[project page](https://iemprog.github.io/DMC/).
 
 ---
 
