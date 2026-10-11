@@ -198,7 +198,7 @@
       [[d[1], "", "CoOp"], [d[2], "kg", "KgCoOp"]].forEach(function (b) {
         var bar = el("div", "gbar " + b[1]);
         var i = el("i"); i.style.width = (-b[0] * 100) + "%"; bar.appendChild(i);
-        bar.setAttribute("data-tip", d[0] + ", " + b[2] + ": γ = " + fmt(b[0], 3));
+        bar.setAttribute("data-tip", d[0] + ", " + b[2] + ": ρ = " + fmt(b[0], 3));
         pair.appendChild(bar);
       });
       row.appendChild(pair);

@@ -28,7 +28,7 @@
     <span><a href="https://enzotarta.github.io/">Enzo Tartaglione</a><sup>1</sup></span>
     <span><a href="https://stelat.eu/">Stéphane Lathuilière</a><sup>3</sup></span>
   </p>
-  <p class="affil"><span><sup>1</sup>Télécom Paris, Institut Polytechnique de Paris</span> <span><sup>2</sup>Google DeepMind</span> <span><sup>3</sup>Inria, Grenoble, France</span></p>
+  <p class="affil"><span><sup>1</sup>Télécom Paris, Institut Polytechnique de Paris</span> <span><sup>2</sup>Google DeepMind</span> <span><sup>3</sup>Inria, Grenoble</span></p>
 
   <nav class="links" aria-label="Resources">
     <span class="btn is-off" aria-disabled="true" title="The paper link will be added when it is public">
@@ -124,7 +124,7 @@
   </figcaption>
 </figure>
 
-<p class="abstract">Prompt learning on CLIP trades accuracy on unseen classes for accuracy on the training classes, because a single prompt has to follow two gradients that point in nearly opposite directions. DMC gives each objective its own prompt, couples the two through a low-loss linear corridor in text-feature space, and deploys one point on that corridor, at the inference cost of a single prompt.</p>
+<p class="abstract">Prompt learning on CLIP trades accuracy on unseen classes for accuracy on the training classes, because a single prompt has to follow two gradients that point in opposing directions. DMC gives each objective its own prompt, couples the two through a low-loss linear corridor in text-feature space, and deploys one point on that corridor, at the inference cost of a single prompt.</p>
 
 <section id="tradeoff">
   <h2>The trade-off</h2>
@@ -143,16 +143,16 @@
 </section>
 
 <section id="ceiling">
-  <h2>Why a better loss does not fix it</h2>
+  <h2>Why another loss does not fix it</h2>
   <p>Methods such as KgCoOp and MergeTune add a regularizer <span class="m-gen">\(\mathcal{R}\)</span> that pulls the prompt back toward CLIP's zero-shot text features. When one prompt \(\mathbf{c}\) carries both terms, every stationary point of \(\mathcal{L}_{\mathrm{CE}} + \lambda\mathcal{R}\) satisfies</p>
   <div class="eq">\[ \htmlClass{m-spec}{\nabla_{\mathbf{c}}\,\mathcal{L}_{\mathrm{CE}}} \;=\; -\lambda\,\htmlClass{m-gen}{\nabla_{\mathbf{c}}\,\mathcal{R}}. \]</div>
-  <p>No step from there improves both objectives, and changing \(\lambda\) slides the solution along the trade-off rather than past it. The opposition shows up in practice: at the converged single-prompt model, the cosine \(\gamma\) between the two gradients is negative on every dataset and baseline we measured.</p>
+  <p>No step from there improves both objectives, and changing \(\lambda\) slides the solution along the trade-off rather than past it. The opposition shows up in practice: at the converged single-prompt model, the cosine \(\rho\) between the two gradients is negative on all eight dataset and baseline pairs we measured. Its magnitude says that a trade-off exists, not how much DMC will gain.</p>
 
   <figure class="chart" id="gammaChart">
     <div class="legend"><span><i class="key k-ink"></i>CoOp</span><span><i class="key k-ink2"></i>KgCoOp</span></div>
     <div class="gbars" id="gbars"></div>
     <div class="axis gaxis"><span style="left:0">−1</span><span style="left:50%">−0.5</span><span style="left:100%">0</span></div>
-    <figcaption>\(\gamma = \cos(\nabla_{\mathbf{c}}\mathcal{L}_{\mathrm{CE}},\,\nabla_{\mathbf{c}}\mathcal{R})\) at the converged MergeTune prompt, over the full training set.</figcaption>
+    <figcaption>\(\rho = \cos(\nabla_{\mathbf{c}}\mathcal{L}_{\mathrm{CE}},\,\nabla_{\mathbf{c}}\mathcal{R})\) at the converged MergeTune prompt, over the full training set.</figcaption>
   </figure>
 
   <p>Swapping the regularizer does not help either. Seven alternatives on the same single prompt, among them Fisher weighting, prompt-space EWC and zero-shot distillation, gained at most 0.40 HM on Caltech101 and Flowers102, about what retuning \(\lambda\) gives.</p>
@@ -197,7 +197,7 @@
     </div>
     <div>
       <h3>Class-permutation invariance</h3>
-      <p>A regularizer that depends on which class is which leaks base-class identity into the prompt. Under idealized assumptions, Fano's inequality turns that leak into a lower bound on the drop in novel accuracy. We rely on the bound for the direction of the effect, not its size. Both regularizers in DMC are invariant.</p>
+      <p>A regularizer that depends on which class is which leaks base-class identity into the prompt. Under idealized assumptions, Fano's inequality turns that leak into a lower bound on the drop in novel accuracy. We rely on the bound for the direction of the effect, not its size. Invariance is necessary, not sufficient; both regularizers in DMC satisfy it.</p>
     </div>
   </div>
 </section>
@@ -235,7 +235,7 @@
 
 <section id="limits">
   <h2>Where it does not help</h2>
-  <p>DMC needs its two endpoints to stay apart after training. On the prompt-tuning baselines they do. On MMA, whose adapter is small, both endpoints collapse onto the same classifier and the corridor shrinks to a point. MMA with DMC still improves on MMA with MergeTune, but both trail the published MMA result. Separation is necessary, not sufficient.</p>
+  <p>DMC needs its two endpoints to stay apart after training. On the prompt-tuning baselines they do. On MMA, whose adapter is small, both endpoints collapse onto the same classifier and the corridor shrinks to a point. MMA with DMC still improves a little on MMA with MergeTune, but those gains do not track the residual separation, and both trail the published MMA result, a gap the collapse alone does not explain. Separation is necessary, not sufficient.</p>
 
   <figure class="chart" id="cosChart">
     <div class="cbars">
