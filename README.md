@@ -60,16 +60,12 @@ regularizer preserves CLIP's pretrained class-similarity structure during
 specialization; equivalently, it minimizes the KL divergence between the learned
 and pretrained class-similarity distributions. We introduce *class-permutation
 invariance* (CPI) as a necessary condition for regularizer transfer across the
-base-novel boundary, and prove via Fano's inequality that any CPI violation
-lower-bounds the drop in novel accuracy by a term proportional to the mutual
-information between the prompt and base-class labels. DMC improves base and novel
-accuracy on the majority of dataset-baseline combinations across 11 datasets and
-two prompt-tuning baselines (CoOp, KgCoOp), averaged over 3 seeds, shifting the
-Pareto frontier rather than trading along it. We further identify the condition
-under which the method composes with a given parameter-efficient baseline: the
-two endpoints must stay geometrically separated after joint training. The
-condition holds for prompt tuning and for text-encoder LoRA, and fails for the
-adapter-based MMA, where the endpoints collapse and the corridor degenerates.
+base-novel boundary, and prove via Fano's inequality that, under idealized
+assumptions, any CPI violation lower-bounds the drop in novel accuracy by a term proportional to the mutual
+information between the prompt and base-class labels. Across 11 datasets and
+two prompt-tuning baselines (CoOp, KgCoOp), DMC improves base and novel accuracy
+on the majority of dataset-baseline combinations, shifting the Pareto frontier
+rather than trading along it.
 
 ---
 
@@ -123,9 +119,9 @@ single-prompt method.
 Over the single-prompt MergeTune stage, DMC raises average HM by **+0.78**
 (CoOp) and **+0.33** (KgCoOp), improving on 8/10 and 7/10 non-ImageNet datasets
 respectively; the few drops (at most 0.93 HM) are within seed spread. On MMA
-the two endpoints collapse (`cos(f_gen, f_spec) = 0.993`), so the corridor
-degenerates: MMA + DMC edges out MMA + MergeTune but both trail the published
-MMA. Training-free merging (TIES, DARE) lowers HM for every base method. The
+the two endpoints collapse (`cos(f_gen, f_spec) = 0.993`), so the corridor adds
+little: MMA + DMC edges out MMA + MergeTune, and both trail the published MMA, a
+gap already present before DMC. Training-free merging (TIES, DARE) lowers HM for every base method. The
 full per-dataset tables are in the paper and on the
 [project page](https://iemprog.github.io/DMC/).
 
@@ -304,7 +300,7 @@ DMC/
 | `mergetune_no_cosine.sh` | single-prompt MergeTune without `R` |
 | `fixed_w1.sh` | replaces the learned `c_gen` with fixed zero-shot features |
 | `gen_endpoint.sh` | generalization-endpoint variants |
-| `gradient_conflict.sh` | measures `γ = cos(∇L_CE, ∇R)` at convergence |
+| `gradient_conflict.sh` | measures `ρ = cos(∇L_CE, ∇R)` at convergence |
 | `sweep_beta_*.sh` | `β` sweep on the development datasets |
 | `sweep_lambda_gen_*.sh` | `λ_gen` sweep on the development datasets |
 
