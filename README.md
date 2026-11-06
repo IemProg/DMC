@@ -9,10 +9,10 @@
 [![Python](https://img.shields.io/badge/python-3.8-blue)](#installation)
 
 [Imad Eddine Marouf](https://iemprog.github.io/)<sup>1</sup>, Khalid Oublal<sup>2</sup>,
-[Enzo Tartaglione](https://enzotarta.github.io/)<sup>1</sup>,
-[Stéphane Lathuilière](https://stelat.eu/)<sup>3</sup>
+[Enzo Tartaglione](https://enzotarta.github.io/)<sup>1,3</sup>,
+[Stéphane Lathuilière](https://stelat.eu/)<sup>1,4</sup>
 
-<sup>1</sup>Télécom Paris, Institut Polytechnique de Paris, France &nbsp; <sup>2</sup>Google DeepMind &nbsp; <sup>3</sup>Inria, Grenoble, France
+<sup>1</sup>Télécom Paris, Institut Polytechnique de Paris, Palaiseau, France &nbsp; <sup>2</sup>Google DeepMind &nbsp; <sup>3</sup>CNR-ISASI, Lecce, Italy &nbsp; <sup>4</sup>Inria, Univ. Grenoble Alpes, CNRS, LJK, France
 
 **Project page:** https://iemprog.github.io/DMC/
 
