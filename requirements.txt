@@ -1,0 +1,14 @@
+# Core dependencies for DMC.
+#
+# Install PyTorch first, matched to your CUDA version (see https://pytorch.org),
+# then install Dassl from Dassl.ProGrad.pytorch/ with `pip install -e .`.
+# Dassl pulls in its own requirements (yacs, gdown, tabulate, tensorboard, ...).
+
+torch>=1.8.1
+torchvision>=0.9.1
+numpy
+scipy
+Pillow
+ftfy
+regex
+tqdm
